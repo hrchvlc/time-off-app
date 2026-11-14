@@ -1,31 +1,30 @@
-/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
-/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
+    "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "isolatedModules": true,
+    "outDir": "./dist/out-tsc",
+    "rootDir": ".",
+    "sourceMap": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "ES2022",
-    "module": "preserve"
+    "target": "es2022",
+    "moduleResolution": "bundler",
+    "module": "preserve",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
   },
   "angularCompilerOptions": {
-    "enableI18nLegacyMessageIdFormat": false,
-    "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true
-  },
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
+    "extendedDiagnostics": {
+      "defaultCategory": "error"
     },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ]
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictTemplates": true
+  },
+  "exclude": ["node_modules", "dist"]
 }

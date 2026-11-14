@@ -1,5 +1,3 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
 # Compiled output
 /dist
 /tmp
@@ -42,3 +40,26 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Android / Capacitor
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/local.properties
+/android/.idea/
+/android/captures/
+/android/.externalNativeBuild/
+/android/.cxx/
+*.iml
+
+# Capacitor: copied web build and generated config (recreated by `npx cap sync`)
+/android/app/src/main/assets/public
+/android/app/src/main/assets/capacitor.config.json
+/android/app/src/main/assets/capacitor.plugins.json
+/android/app/src/main/res/xml/config.xml
+/android/capacitor-cordova-android-plugins/
+
+# Signing secrets: never commit these
+*.jks
+*.keystore
+keystore.properties
