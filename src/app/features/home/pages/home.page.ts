@@ -27,6 +27,7 @@ const dummyAccounts: Account[] = [
 export class HomePage {
   public readonly router: Router = inject(Router);
   public readonly demoAccounts: WritableSignal<Account[]> = signal(dummyAccounts);
+  public readonly Role: typeof Role = Role;
 
   public chooseAccount(chosenAccount: Role): void {
     this.router.navigate([`${chosenAccount}`.toLowerCase() + '/overview']);

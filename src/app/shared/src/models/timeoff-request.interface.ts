@@ -1,4 +1,4 @@
-import { TypeOffRequestStatus } from "./timeoff-request-status.type";
+import { TypeOffRequestStatus } from "./timeoff-request-status.enum";
 import { TimeOffType } from "./timeoff-type.enum";
 
 export interface TimeOffRequest {

@@ -1,11 +1,32 @@
 <ion-app>
   <ion-menu contentId="main-content">
     <ion-header>
-      <ion-toolbar color="tertiary">
+      <ion-toolbar color="primary">
         <ion-title>Menu</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="ion-padding">This is the menu content.</ion-content>
+    <ion-content class="ion-padding">
+      <section class="demo">
+        <ion-item button (click)="returnHome()" class="title">Time off</ion-item>
+      </section>
+      <section class="demo">
+        <h2 class="demo-heading">Switch account</h2>
+          @for (account of demoAccounts(); track account.id) {
+            <ion-item button (click)="chooseAccount(account.role)">
+             <span class="avatar"
+                   role="img"
+                   [attr.aria-label]="'Avatar ' + account.role"
+                   [class.supervisor]="account.role === Role.Supervisor"
+                   [style.--icon]="'url(assets/icons/' + (account.role | lowercase) + '.svg)'">
+              </span>
+              <ion-label>
+                <span class="name">{{ account.name }}</span>
+                <span class="role">{{ account.role }}</span>
+              </ion-label>
+            </ion-item>
+          }
+      </section>
+    </ion-content>
   </ion-menu>
   <div class="ion-page" id="main-content">
     <ion-header>
@@ -13,7 +34,6 @@
         <ion-buttons slot="start">
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
-        <ion-title>Time off</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content class="ion-padding"> <ion-router-outlet></ion-router-outlet> </ion-content>

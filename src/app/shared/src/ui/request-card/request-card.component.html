@@ -11,9 +11,14 @@
             }
         </div>
         <div>
-          <span>{{ request.status }}</span>
+          @if (!isSupervisor()) {
+            <span>{{ request.status }}</span>
+          }
         </div>
       </div>
+      @if (isSupervisor()) {
+        <span>{{ request.employeeFullName }}</span>
+      }
 
     </ion-card-title>
     <ion-card-subtitle class="sub">
@@ -30,5 +35,15 @@
           <span>{{ request.note }}</span>
         }
     </div>
+    @if (isSupervisor() && request.status === TypeOffRequestStatus.Pending) {
+      <div class="flex-container">
+        <ion-button (click)="changeStatus('Reject')" color="danger">
+          Reject
+        </ion-button>
+              <ion-button (click)="changeStatus('Approve')">
+          Approve
+        </ion-button>
+      </div>
+    }
   </ion-card-content>
 </ion-card>

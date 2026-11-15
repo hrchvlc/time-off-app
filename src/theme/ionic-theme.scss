@@ -1,5 +1,5 @@
 // Maps the design tokens (projects/ui/src/styles/tokens.css) onto Ionic's variables.
-// Ionic needs the `-rgb` triplets as literals, so they repeat the token values.
+
 :root {
   --ion-font-family: var(--ui-font);
   --ion-background-color: var(--ui-ground);
@@ -119,3 +119,10 @@ ion-item.ion-focused {
     transform: none;
   }
 }
+
+
+ion-menu::part(container) {
+  border-radius: 0 20px 20px 0;
+  overflow: hidden;
+}
+

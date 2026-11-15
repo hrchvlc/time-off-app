@@ -32,9 +32,8 @@
               }
             ],
             "styles": [
-              "src/styles/_variables.scss",
+              "src/theme/_variables.scss",
               "src/theme/tokens.css",
-              "src/styles.scss",
               {
                 "input": "node_modules/@ionic/angular/css/core.css"
               },
@@ -64,7 +63,8 @@
               },
               {
                 "input": "node_modules/@ionic/angular/css/flex-utils.css"
-              }
+              },
+              "src/styles.scss"
             ]
           },
           "configurations": {

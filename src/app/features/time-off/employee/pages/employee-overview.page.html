@@ -1,5 +1,5 @@
 <ion-content>
-  <ion-refresher #refresher slot="fixed" (ionRefresh)="refresh(refresher)">
+  <ion-refresher #refresher slot="fixed">
     <ion-refresher-content />
   </ion-refresher>
 
@@ -45,48 +45,6 @@
     } @else {
       <h3>No upcoming time off</h3>
     }
-
-    <!-- @if (skeleton()) {
-      <div class="list" aria-busy="true">
-        <p class="visually-hidden" role="status">Loading your time off…</p>
-        @for (n of [1, 2, 3]; track n) {
-          <div class="card skeleton" aria-hidden="true">
-            <ion-skeleton-text [animated]="true" class="range" />
-            <ion-skeleton-text [animated]="true" class="sub" />
-            <ion-skeleton-text [animated]="true" class="strip" />
-          </div>
-        }
-      </div>
-    } -->
-    <!-- @else if (store.loadError(); as message) {
-      <ui-empty-state
-        icon="cloud-offline-outline"
-        heading="Couldn't load your time off"
-        [message]="message"
-      >
-        <ion-button fill="outline" (click)="store.load()">Try again</ion-button>
-      </ui-empty-state>
-    } @else if (requests().length) {
-      <div class="list">
-        @for (request of requests(); track request.id) {
-          <ui-request-card [request]="request" />
-        }
-      </div>
-      -->
-     <!-- @else if (activeTab() === 'upcoming') {
-      <ui-empty-state
-        icon="calendar-clear-outline"
-        heading="No upcoming time off"
-        message="Plan a break — it starts with a request."
-      >
-      </ui-empty-state>
-    } @else {
-      <ui-empty-state
-        icon="time-outline"
-        heading="No past time off"
-        message="Requests you've taken will show up here."
-      />
-    }  -->
   </div>
 </ion-content>
 
