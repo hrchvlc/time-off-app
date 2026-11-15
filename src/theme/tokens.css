@@ -1,0 +1,28 @@
+:root {
+  --ui-ground: #f3f5f8;
+  --ui-surface: #ffffff;
+  --ui-ink: #14213d;
+  --ui-ink-2: #58637a;
+  --ui-ink-3: #656f82;
+  --ui-ink-4: #a3abb8;
+  --ui-on-ink: #ffffff;
+  --ui-supervisor: #3c4c6b;
+  --ui-line: #e1e5ec;
+  --ui-stroke: #c2c9d4;
+  --ui-control: #eef1f5;
+  --ui-control-border: #cbd2dc;
+  --ui-disabled: #c3c9d3;
+  --ui-well: #e3e7ed;
+  --ui-track: #edf0f4;
+  --ui-track-weekend: #f6f7f9;
+  --ui-range-tint: #e6eefb;
+  --ui-vacation: #2a6fdb;
+  --ui-sick: #d9485f;
+  --ui-personal: #ad7406;
+  --ui-warning: #9a3412;
+
+  --ui-radius-card: 16px;
+  --ui-radius-control: 12px;
+  --ui-font: 'Archivo Variable', system-ui, sans-serif;
+  --ui-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}

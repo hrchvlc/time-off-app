@@ -16,6 +16,9 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
+    "paths": {
+      "@timeoff/shared": ["./src/app/shared/src/index.ts"]
+    }
   },
   "angularCompilerOptions": {
     "extendedDiagnostics": {

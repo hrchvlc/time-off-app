@@ -1,8 +1,19 @@
 import { Component } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular';
+import { IonApp, IonButtons, IonContent, IonHeader, IonMenu, IonMenuButton, IonRouterOutlet, IonTitle, IonToolbar } from '@ionic/angular';
 
 @Component({
-  imports: [IonApp, IonRouterOutlet],
+  imports: [
+    IonApp,
+    IonRouterOutlet,
+    IonHeader,
+    IonToolbar,
+    IonHeader,
+    IonTitle,
+    IonMenu,
+    IonContent,
+    IonButtons,
+    IonMenuButton,
+  ],
   selector: 'app-root',
   templateUrl: './app.component.html',
 })

@@ -27,10 +27,13 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
+              "src/styles/_variables.scss",
+              "src/theme/tokens.css",
               "src/styles.scss",
               {
                 "input": "node_modules/@ionic/angular/css/core.css"
@@ -61,9 +64,6 @@
               },
               {
                 "input": "node_modules/@ionic/angular/css/flex-utils.css"
-              },
-              {
-                "input": "src/theme/variables.css"
               }
             ]
           },

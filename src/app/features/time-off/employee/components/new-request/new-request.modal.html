@@ -1,0 +1,76 @@
+<ion-header class="ion-no-border">
+  <div class="top">
+    <ion-button fill="clear" class="cancel" (click)="closeModal()">Cancel</ion-button>
+    <h2>New request</h2>
+  </div>
+</ion-header>
+
+<ion-content>
+  <div class="container">
+    <form [formGroup]="form">
+      <div class="group">
+        <span class="label" aria-hidden="true">Start date<ion-text color="danger">*</ion-text></span>
+        <ion-datetime-button datetime="startDate"></ion-datetime-button>
+        <span slot="date-target" [class.placeholder]="now"></span>
+
+        <ion-modal [keepContentsMounted]="true"
+                   [initialBreakpoint]="1"
+                   [breakpoints]="[0, 1]">
+          <ion-datetime
+            id="startDate"
+            formControlName="startDate"
+            presentation="date"
+            [firstDayOfWeek]="1"
+            [min]="now"
+            [showDefaultButtons]="true"
+          ></ion-datetime>
+        </ion-modal>
+      </div>
+
+      <div class="group">
+        <span class="label" aria-hidden="true">End date<ion-text color="danger">*</ion-text></span>
+        <ion-datetime-button datetime="endDate"></ion-datetime-button>
+        <span slot="date-target" [class.placeholder]="now"></span>
+
+        <ion-modal [keepContentsMounted]="true"
+                   [initialBreakpoint]="1"
+                   [breakpoints]="[0, 1]">
+          <ion-datetime
+            id="endDate"
+            formControlName="endDate"
+            presentation="date"
+            [firstDayOfWeek]="1"
+            [min]="now"
+            [showDefaultButtons]="true"
+          ></ion-datetime>
+        </ion-modal>
+      </div>
+
+      <div class="group">
+        <div slot="label" class="label">Vacation type<ion-text color="danger">*</ion-text></div>
+        <ion-select placeholder="Select vacation type" formControlName="type">
+          @for (type of timeOffTypes; track $index) {
+            <ion-select-option [value]="type">{{ type }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+
+      <div class="group">
+        <ion-textarea
+          formControlName="note"
+          labelPlacement="stacked"
+          placeholder="Add a note"
+          [rows]="3"
+          [maxlength]="300">
+            <div slot="label">Note <span class="optional">(optional)</span></div>
+        </ion-textarea>
+      </div>
+    </form>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-button expand="block" (click)="createNewRequest()">
+      Send request
+  </ion-button>
+</ion-footer>
