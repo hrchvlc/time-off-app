@@ -1,1 +1,49 @@
-<ion-content></ion-content>
+<ion-content>
+  <ion-refresher #refresher slot="fixed">
+    <ion-refresher-content />
+  </ion-refresher>
+
+  <div class="column">
+    <header class="top">
+      <h1 class="title">My requests</h1>
+    </header>
+
+    <ion-segment [value]="activeTab()" (ionChange)="changeActiveTab($event.detail.value)">
+      <ion-segment-button value="upcoming">
+        <ion-label>Upcoming
+          @if (allRequests().length) {
+            <span class="count">{{ pendingRequests().length }}</span>
+          }
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="past">
+        <ion-label>
+          Past
+           @if (allRequests().length) {
+            <span class="count">{{ pastRequests().length }}</span>
+          }
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    @if (allRequests().length) {
+      @if(activeTab() === 'pending') {
+        @if (!pendingRequests().length) {
+          <h2>empty</h2>
+        }
+        @for (request of pendingRequests(); track request.id) {
+          <app-request-card [timeOffRequest]="request" [isSupervisor]="true" (statusChanged)="onChangeRequestStatus($event)"></app-request-card>
+        }
+      } @else if (activeTab() === 'past') {
+          @if (!pastRequests().length) {
+            <h2>empty</h2>
+          }
+          @for (request of pastRequests(); track request.id) {
+            <app-request-card [timeOffRequest]="request" [isSupervisor]="true"></app-request-card>
+          }
+      }
+    } @else {
+      <h3>No upcoming time off</h3>
+    }
+  </div>
+</ion-content>
