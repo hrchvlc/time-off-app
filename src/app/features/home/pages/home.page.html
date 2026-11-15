@@ -1,0 +1,26 @@
+<ion-content>
+  <div class="column">
+    <div class="mark">
+      <span class="week"><span class="bar vacation-ink"></span></span>
+      <span class="week"><span class="bar sick-pencil"></span></span>
+      <span class="week">
+        <span class="bar crossed"></span>
+        <span class="bar personal-ink"></span>
+      </span>
+    </div>
+
+    <section class="demo">
+      <h2 class="demo-heading">Login as</h2>
+      <h2 class="demo-heading">Employee/Supervisor</h2>
+        @for (account of demoAccounts(); track account.id) {
+          <ion-button (click)="chooseAccount(account.role)">
+            <div class="box">
+            <img [src]="'assets/icons/' + ( account.role | lowercase) + '.svg#'" [alt]="'Avatar ' + account.role" class="box__img">
+              <span class="name">{{ account.name }}</span>
+              <span class="role">{{ account.role }}</span>
+            </div>
+          </ion-button>
+        }
+    </section>
+  </div>
+</ion-content>

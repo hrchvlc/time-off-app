@@ -1,0 +1,34 @@
+@let request = timeOffRequest();
+
+<ion-card class="card">
+  <ion-card-header>
+    <ion-card-title>
+      <div class="flex-container">
+        <div>
+          <span>{{ request.startDate | date: 'MMM d, yy' }}</span>
+            @if (request.endDate !== request.startDate) {
+              <span> — {{ request.endDate | date: 'MMM d, yy' }}</span>
+            }
+        </div>
+        <div>
+          <span>{{ request.status }}</span>
+        </div>
+      </div>
+
+    </ion-card-title>
+    <ion-card-subtitle class="sub">
+      <div class="flex-container">
+        <span>{{ request.type }}</span>
+        <span>{{ request.workingDays }} day/s</span>
+      </div>
+    </ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <div class="content">
+        @if (request.note) {
+          <span>{{ request.note }}</span>
+        }
+    </div>
+  </ion-card-content>
+</ion-card>
