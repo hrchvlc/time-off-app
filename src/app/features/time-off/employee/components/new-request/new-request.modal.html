@@ -9,46 +9,49 @@
   <div class="container">
     <form [formGroup]="form">
       <div class="group">
-        <span class="label" aria-hidden="true">Start date<ion-text color="danger">*</ion-text></span>
+        <span class="label">Start date<ion-text color="danger">*</ion-text></span>
         <ion-datetime-button datetime="startDate"></ion-datetime-button>
-        <span slot="date-target" [class.placeholder]="now"></span>
 
         <ion-modal [keepContentsMounted]="true"
                    [initialBreakpoint]="1"
                    [breakpoints]="[0, 1]">
-          <ion-datetime
-            id="startDate"
-            formControlName="startDate"
-            presentation="date"
-            [firstDayOfWeek]="1"
-            [min]="now"
-            [showDefaultButtons]="true"
-          ></ion-datetime>
+          <ng-template>
+            <ion-datetime
+              id="startDate"
+              formControlName="startDate"
+              presentation="date"
+              [firstDayOfWeek]="1"
+              [min]="now"
+              [showDefaultButtons]="true"
+            ></ion-datetime>
+          </ng-template>
         </ion-modal>
       </div>
 
       <div class="group">
-        <span class="label" aria-hidden="true">End date<ion-text color="danger">*</ion-text></span>
+        <span class="label">End date<ion-text color="danger">*</ion-text></span>
         <ion-datetime-button datetime="endDate"></ion-datetime-button>
         <span slot="date-target" [class.placeholder]="now"></span>
 
         <ion-modal [keepContentsMounted]="true"
                    [initialBreakpoint]="1"
                    [breakpoints]="[0, 1]">
-          <ion-datetime
-            id="endDate"
-            formControlName="endDate"
-            presentation="date"
-            [firstDayOfWeek]="1"
-            [min]="now"
-            [showDefaultButtons]="true"
-          ></ion-datetime>
+          <ng-template>
+            <ion-datetime
+              id="endDate"
+              formControlName="endDate"
+              presentation="date"
+              [firstDayOfWeek]="1"
+              [min]="now"
+              [showDefaultButtons]="true"
+            ></ion-datetime>
+          </ng-template>
         </ion-modal>
       </div>
 
       <div class="group">
-        <div slot="label" class="label">Vacation type<ion-text color="danger">*</ion-text></div>
         <ion-select placeholder="Select vacation type" formControlName="type">
+          <div slot="label" class="label">Vacation type<ion-text color="danger">*</ion-text></div>
           @for (type of timeOffTypes; track $index) {
             <ion-select-option [value]="type">{{ type }}</ion-select-option>
           }
@@ -70,7 +73,7 @@
 </ion-content>
 
 <ion-footer class="ion-no-border">
-  <ion-button expand="block" (click)="createNewRequest()">
+  <ion-button expand="block" (click)="createNewRequest()" [disabled]="!form.valid">
       Send request
   </ion-button>
 </ion-footer>

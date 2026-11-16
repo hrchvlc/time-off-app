@@ -1,4 +1,4 @@
-// Maps the design tokens (projects/ui/src/styles/tokens.css) onto Ionic's variables.
+// Maps the design tokens (theme/tokens.css) onto Ionic's variables.
 
 :root {
   --ion-font-family: var(--ui-font);
@@ -16,6 +16,20 @@
   --ion-color-primary-contrast-rgb: 255, 255, 255;
   --ion-color-primary-shade: #121d36;
   --ion-color-primary-tint: #2c3750;
+
+  --ion-color-secondary: #fca311;
+  --ion-color-secondary-rgb: 252, 163, 17;
+  --ion-color-secondary-contrast: #14213d;
+  --ion-color-secondary-contrast-rgb: 20, 33, 61;
+  --ion-color-secondary-shade: #de8f0f;
+  --ion-color-secondary-tint: #fcac29;
+
+  --ion-color-tertiary: #6b7280;
+  --ion-color-tertiary-rgb: 107, 114, 128;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #5e656f;
+  --ion-color-tertiary-tint: #7a808d;
 
   --ion-color-danger: #b42318;
   --ion-color-danger-rgb: 180, 35, 24;
@@ -71,11 +85,6 @@ ion-textarea {
       inset 0 0 0 1.5px var(--ion-color-danger),
       0 0 0 4px rgb(180 35 24 / 14%);
   }
-}
-
-// ModalController attaches the new-request sheet outside any component's styles.
-ion-modal.new-request-sheet {
-  --border-radius: 24px;
 }
 
 // The header grey is too faint by default; the mode class outranks Ionic's scoped host rule.

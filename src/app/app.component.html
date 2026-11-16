@@ -5,28 +5,32 @@
         <ion-title>Menu</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="ion-padding">
+    <div class="ion-padding">
       <section class="demo">
-        <ion-item button (click)="returnHome()" class="title">Time off</ion-item>
+        <ion-menu-toggle [autoHide]="false">
+          <ion-item button (click)="returnHome()" class="title">Time off</ion-item>
+        </ion-menu-toggle>
       </section>
       <section class="demo">
         <h2 class="demo-heading">Switch account</h2>
-          @for (account of demoAccounts(); track account.id) {
-            <ion-item button (click)="chooseAccount(account.role)">
-             <span class="avatar"
-                   role="img"
-                   [attr.aria-label]="'Avatar ' + account.role"
-                   [class.supervisor]="account.role === Role.Supervisor"
-                   [style.--icon]="'url(assets/icons/' + (account.role | lowercase) + '.svg)'">
-              </span>
-              <ion-label>
-                <span class="name">{{ account.name }}</span>
-                <span class="role">{{ account.role }}</span>
-              </ion-label>
-            </ion-item>
+          @for (account of demoAccounts; track account.id) {
+            <ion-menu-toggle [autoHide]="false">
+              <ion-item button (click)="chooseAccount(account.role)">
+               <span class="avatar"
+                     role="img"
+                     [attr.aria-label]="'Avatar ' + account.role"
+                     [class.supervisor]="account.role === Role.Supervisor"
+                     [style.--icon]="'url(assets/icons/' + (account.role | lowercase) + '.svg)'">
+                </span>
+                <ion-label>
+                  <span class="name">{{ account.name }}</span>
+                  <span class="role">{{ account.role }}</span>
+                </ion-label>
+              </ion-item>
+            </ion-menu-toggle>
           }
       </section>
-    </ion-content>
+    </div>
   </ion-menu>
   <div class="ion-page" id="main-content">
     <ion-header>

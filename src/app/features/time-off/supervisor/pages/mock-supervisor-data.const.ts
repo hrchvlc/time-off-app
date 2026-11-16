@@ -1,6 +1,6 @@
 import { TimeOffRequest, TimeOffType, TypeOffRequestStatus } from "@timeoff/shared";
 
-export const mockTimeOffRequests: TimeOffRequest[] = [
+export const mockTimeOffSupervisorRequests: TimeOffRequest[] = [
   {
     id: 'req-001',
     employeeId: 'emp-101',
@@ -20,8 +20,8 @@ export const mockTimeOffRequests: TimeOffRequest[] = [
   },
   {
     id: 'req-002',
-    employeeId: 'emp-101',
-    employeeFullName: 'Anna Nováková',
+    employeeId: 'emp-102',
+    employeeFullName: 'Jan Svoboda',
     timeOffAllowance: 25,
     timeOffSpent: 17,
     type: TimeOffType.Sick,
@@ -36,8 +36,8 @@ export const mockTimeOffRequests: TimeOffRequest[] = [
   },
   {
     id: 'req-003',
-    employeeId: 'emp-101',
-    employeeFullName: 'Anna Nováková',
+    employeeId: 'emp-103',
+    employeeFullName: 'Petra Černá',
     timeOffAllowance: 25,
     timeOffSpent: 17,
     type: TimeOffType.Personal,
@@ -50,8 +50,8 @@ export const mockTimeOffRequests: TimeOffRequest[] = [
   },
   {
     id: 'req-004',
-    employeeId: 'emp-101',
-    employeeFullName: 'Anna Nováková',
+    employeeId: 'emp-104',
+    employeeFullName: 'Tomáš Procházka',
     timeOffAllowance: 25,
     timeOffSpent: 17,
     type: TimeOffType.Vacation,
@@ -70,7 +70,7 @@ export const mockTimeOffRequests: TimeOffRequest[] = [
     employeeFullName: 'Anna Nováková',
     timeOffAllowance: 25,
     timeOffSpent: 17,
-    type: TimeOffType.Personal,
+    type: TimeOffType.Vacation,
     status: TypeOffRequestStatus.Pending,
     startDate: '2026-11-20T09:15:00.000Z',
     endDate: '2026-11-20T09:15:00.000Z',
@@ -79,8 +79,8 @@ export const mockTimeOffRequests: TimeOffRequest[] = [
   },
   {
     id: 'req-006',
-    employeeId: 'emp-101',
-    employeeFullName: 'Anna Nováková',
+    employeeId: 'emp-105',
+    employeeFullName: 'Eva Horáková',
     timeOffAllowance: 25,
     timeOffSpent: 17,
     type: TimeOffType.Vacation,
@@ -93,8 +93,8 @@ export const mockTimeOffRequests: TimeOffRequest[] = [
   },
   {
     id: 'req-007',
-    employeeId: 'emp-101',
-    employeeFullName: 'Anna Nováková',
+    employeeId: 'emp-102',
+    employeeFullName: 'Jan Svoboda',
     timeOffAllowance: 25,
     timeOffSpent: 17,
     type: TimeOffType.Vacation,
@@ -110,8 +110,8 @@ export const mockTimeOffRequests: TimeOffRequest[] = [
   },
   {
     id: 'req-008',
-    employeeId: 'emp-101',
-    employeeFullName: 'Anna Nováková',
+    employeeId: 'emp-106',
+    employeeFullName: 'David Marek',
     timeOffAllowance: 25,
     timeOffSpent: 17,
     type: TimeOffType.Sick,

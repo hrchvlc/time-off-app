@@ -7,5 +7,5 @@ import { Component, input, InputSignal } from '@angular/core';
 })
 export class EmptyStateComponent {
   public readonly title: InputSignal<string> = input.required<string>();
-  public readonly message: InputSignal<string> = input.required<string>();
+  public readonly message: InputSignal<string | undefined> = input<string | undefined>(undefined);
 }

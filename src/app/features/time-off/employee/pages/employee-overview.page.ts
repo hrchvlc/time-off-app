@@ -1,8 +1,8 @@
 import { Component, computed, inject, signal, Signal, WritableSignal } from '@angular/core';
-import { IonButton, IonContent, IonFooter, IonIcon, IonLabel, IonRefresher, IonRefresherContent, IonSegment, IonSegmentButton, ModalController, SegmentValue } from '@ionic/angular';
-import { NotificationService, RequestCardComponent, TimeOffRequest } from '@timeoff/shared';
+import { IonButton, IonContent, IonFooter, IonLabel, IonRefresher, IonRefresherContent, IonSegment, IonSegmentButton, ModalController, SegmentValue } from '@ionic/angular';
+import { EmptyStateComponent, NotificationService, RequestCardComponent, TimeOffRequest } from '@timeoff/shared';
 import { NewRequestModal } from '../components';
-import { mockTimeOffRequests } from './mock-data.const';
+import { mockTimeOffEmployeeRequests } from './mock-employee-data.const';
 
 type Tab = 'upcoming' | 'past';
 
@@ -10,7 +10,8 @@ type Tab = 'upcoming' | 'past';
   selector: 'app-employee-overview',
   templateUrl: './employee-overview.page.html',
   styleUrls: ['./employee-overview.page.scss'],
-  imports: [    IonContent,
+  imports: [
+    IonContent,
     IonRefresher,
     IonRefresherContent,
     IonSegment,
@@ -18,8 +19,8 @@ type Tab = 'upcoming' | 'past';
     IonLabel,
     IonFooter,
     IonButton,
-    IonIcon,
     RequestCardComponent,
+    EmptyStateComponent,
   ]
 })
 export class EmployeeOverviewPage {
@@ -28,7 +29,7 @@ export class EmployeeOverviewPage {
   private readonly today: string = new Date().toISOString();
 
   protected readonly activeTab: WritableSignal<Tab> = signal<Tab>('upcoming');
-  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal(mockTimeOffRequests);
+  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal(mockTimeOffEmployeeRequests);
 
   protected readonly upcomingRequests: Signal<TimeOffRequest[]> = computed(() =>
     this.allRequests()
@@ -42,9 +43,17 @@ export class EmployeeOverviewPage {
       .sort((a, b) => b.endDate.localeCompare(a.endDate)),
   );
 
-  protected readonly showNewRequest: Signal<boolean> = computed(
-    () =>  this.activeTab() === 'upcoming' && this.upcomingRequests().length > 0 &&
-           (this.upcomingRequests()[0].timeOffSpent < this.upcomingRequests()[0].timeOffAllowance));
+  protected readonly showNewRequestButton: Signal<boolean> = computed(
+    () =>  {
+      if (this.activeTab() !== 'upcoming') {
+        return false;
+      }
+      const hasNoRequests = this.upcomingRequests().length === 0;
+      const firstRequest = this.upcomingRequests()[0];
+      const hasAllowance = !!firstRequest && firstRequest.timeOffSpent < firstRequest.timeOffAllowance;
+
+      return hasNoRequests || hasAllowance;
+    });
 
   public changeActiveTab(value: SegmentValue | undefined): void {
     if (!value) {
@@ -61,14 +70,19 @@ export class EmployeeOverviewPage {
       },
     });
     await newRequestModal.present();
-    const res = await newRequestModal.onWillDismiss();
-
-    if (res.data.status === 'created') {
+    const { data } = await newRequestModal.onWillDismiss();
+    if (data) {
       this.notificationService.success('Request successfully submitted.');
-    } else if (res.data.status === 'failed') {
-      this.notificationService.success('Request not submitted.');
-    } else {
-      this.notificationService.success('Error has occured. Try again later.');
     }
+
+    // Place for request
+
+    // if (data?.status === 'created') {
+    //   this.notificationService.success('Request successfully submitted.');
+    // } else if (data?.status === 'failed') {
+    //   this.notificationService.success('Request not submitted.');
+    // } else {
+    //   this.notificationService.success('Error has occured. Try again later.');
+    // }
   }
 }

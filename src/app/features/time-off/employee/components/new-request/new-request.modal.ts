@@ -1,7 +1,19 @@
 import { Component, inject, input, InputSignal } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonButton, IonContent, IonDatetime, IonDatetimeButton, IonFooter, IonHeader, IonSelect, IonSelectOption, IonText, IonTextarea, ModalController } from '@ionic/angular';
-import { IonModal } from '@ionic/angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  IonButton,
+  IonContent,
+  IonDatetime,
+  IonDatetimeButton,
+  IonFooter,
+  IonHeader,
+  IonModal,
+  IonSelect,
+  IonSelectOption,
+  IonText,
+  IonTextarea,
+  ModalController,
+} from '@ionic/angular';
 import { NewTimeOffRequest, TimeOffType } from '@timeoff/shared';
 
 @Component({
@@ -10,7 +22,6 @@ import { NewTimeOffRequest, TimeOffType } from '@timeoff/shared';
   templateUrl: './new-request.modal.html',
   imports: [
     ReactiveFormsModule,
-    FormsModule,
     IonHeader,
     IonButton,
     IonContent,
@@ -30,7 +41,7 @@ export class NewRequestModal {
   public readonly employeeId: InputSignal<number> = input.required<number>();
   public readonly form: FormGroup = this.initializeForm();
   public readonly timeOffTypes: TimeOffType[] = Object.values(TimeOffType);
-  public readonly now: Date = new Date();
+  public readonly now: string = new Date().toISOString();
 
   public closeModal(): void {
     this.modalCtrl.dismiss();
@@ -42,21 +53,15 @@ export class NewRequestModal {
       employeeId: this.employeeId(),
     };
 
-    // Place for request, error handling and loading
-    const response = {
-      status: 'created',
-      response: request
-    };
-
-    await this.modalCtrl.dismiss(response);
+    await this.modalCtrl.dismiss(request);
   }
 
   private initializeForm(): FormGroup {
     return this.formBuilder.group({
-      startDate: [ undefined, Validators.required ],
-      endDate: [ undefined, Validators.required ],
-      type: [ undefined, Validators.required ],
-      note: [ undefined ]
+      startDate: [ null, Validators.required ],
+      endDate: [ null, Validators.required ],
+      type: [ null, Validators.required ],
+      note: [ null ]
     });
   }
 }

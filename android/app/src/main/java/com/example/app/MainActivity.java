@@ -1,4 +1,4 @@
-package com.example.app;
+package com.timeoff.app;
 
 import com.getcapacitor.BridgeActivity;
 

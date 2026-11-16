@@ -1,7 +1,7 @@
 import { Component, computed, inject, Signal, signal, WritableSignal } from '@angular/core';
 import { AlertController, IonContent, IonLabel, IonRefresher, IonRefresherContent, IonSegment, IonSegmentButton, SegmentValue } from '@ionic/angular';
-import { RequestCardComponent, TimeOffRequest, TypeOffRequestStatus } from '@timeoff/shared';
-import { mockTimeOffRequests } from './mock-data.const';
+import { ChangeRequest, EmptyStateComponent, RequestCardComponent, TimeOffRequest, TypeOffRequestStatus } from '@timeoff/shared';
+import { mockTimeOffSupervisorRequests } from './mock-supervisor-data.const';
 
 type Tab = 'pending' | 'past';
 
@@ -17,13 +17,14 @@ type Tab = 'pending' | 'past';
     IonRefresher,
     IonRefresherContent,
     RequestCardComponent,
+    EmptyStateComponent
   ]
 })
 export class SupervisorOverviewPage {
   private readonly alertController: AlertController = inject(AlertController);
 
   protected readonly activeTab: WritableSignal<Tab> = signal<Tab>('pending');
-  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal(mockTimeOffRequests);
+  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal(mockTimeOffSupervisorRequests);
 
   protected readonly pendingRequests: Signal<TimeOffRequest[]> = computed(() =>
     this.allRequests()
@@ -37,6 +38,8 @@ export class SupervisorOverviewPage {
       .sort((a, b) => b.endDate.localeCompare(a.endDate)),
   );
 
+  public readonly TypeOffRequestStatus: typeof TypeOffRequestStatus = TypeOffRequestStatus;
+
   public changeActiveTab(value: SegmentValue | undefined): void {
     if (!value) {
       return;
@@ -44,21 +47,31 @@ export class SupervisorOverviewPage {
     this.activeTab.set(value as Tab);
   }
 
-  public async onChangeRequestStatus(status: string): Promise<void> {
+  public async onChangeRequestStatus(changedRequest: ChangeRequest): Promise<void> {
+    const status = this.determineStatus(changedRequest.status);
     const alert = await this.alertController.create({
       header: 'Confirm',
-      message: `Are you sure you want to ${status.toLowerCase()} this request?`,
+      message: `Are you sure you want to ${status} this request?`,
       buttons: [
         { text: 'Cancel', role: 'cancel' },
-        { text: `${status}`, role: 'confirm', cssClass: 'danger' },
+        { text: `${status}`, role: 'confirm' },
       ],
     });
 
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
+    if (role === 'cancel') {
+      return;
+    }
     if (role === 'confirm') {
     // change status
+      // const changeRequest = changedRequest;
+
     }
+  }
+
+  private determineStatus(status: TypeOffRequestStatus): string {
+    return status === TypeOffRequestStatus.Approved ?  status.toLowerCase().slice(0, -1) : status.toLowerCase().slice(0, -2);
   }
 }

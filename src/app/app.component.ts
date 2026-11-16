@@ -1,22 +1,8 @@
 import { LowerCasePipe } from '@angular/common';
-import { Component, inject, signal, WritableSignal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonApp, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonMenu, IonMenuButton, IonRouterOutlet, IonTitle, IonToolbar } from '@ionic/angular';
-import { Account, Role } from '@timeoff/shared';
-
-const dummyAccounts: Account[] = [
-  {
-    id: "1234",
-    name: "Dummy Employee",
-    role: Role.Employee,
-  },
-  {
-    id: "4321",
-    name: "Dummy Supervisor",
-    role: Role.Supervisor,
-
-  }
-];
+import { IonApp, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonMenu, IonMenuButton, IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar } from '@ionic/angular';
+import { Account, dummyAccounts, Role } from '@timeoff/shared';
 
 @Component({
   selector: 'app-root',
@@ -35,12 +21,13 @@ const dummyAccounts: Account[] = [
     IonMenuButton,
     IonItem,
     IonLabel,
+    IonMenuToggle,
     LowerCasePipe
   ],
 })
 export class AppComponent {
-  public readonly router: Router = inject(Router);
-  public readonly demoAccounts: WritableSignal<Account[]> = signal(dummyAccounts);
+  private readonly router: Router = inject(Router);
+  public readonly demoAccounts: Account[] = dummyAccounts;
   public readonly Role: typeof Role = Role;
 
   public chooseAccount(chosenAccount: Role): void {

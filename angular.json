@@ -33,7 +33,6 @@
             ],
             "styles": [
               "src/theme/_variables.scss",
-              "src/theme/tokens.css",
               {
                 "input": "node_modules/@ionic/angular/css/core.css"
               },
