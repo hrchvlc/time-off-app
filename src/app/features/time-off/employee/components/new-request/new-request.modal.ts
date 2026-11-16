@@ -1,6 +1,8 @@
+import { DatePipe } from '@angular/common';
 import { Component, inject, input, InputSignal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
+  IonBadge,
   IonButton,
   IonContent,
   IonDatetime,
@@ -14,7 +16,7 @@ import {
   IonTextarea,
   ModalController,
 } from '@ionic/angular';
-import { NewTimeOffRequest, TimeOffType } from '@timeoff/shared';
+import { dateRangeValidator, maxDurationValidator, NewTimeOffRequest, TimeOffType } from '@timeoff/shared';
 
 @Component({
   selector: 'app-new-request',
@@ -32,28 +34,44 @@ import { NewTimeOffRequest, TimeOffType } from '@timeoff/shared';
     IonDatetimeButton,
     IonModal,
     IonDatetime,
-    IonTextarea
+    IonTextarea,
+    IonBadge,
+    DatePipe
   ]
 })
 export class NewRequestModal {
   private readonly formBuilder: FormBuilder = inject(FormBuilder);
   private readonly modalCtrl: ModalController = inject(ModalController);
+  // Could be changed according to employee allowance
+  private readonly maxDuration: number = 25;
   public readonly employeeId: InputSignal<number> = input.required<number>();
   public readonly form: FormGroup = this.initializeForm();
   public readonly timeOffTypes: TimeOffType[] = Object.values(TimeOffType);
   public readonly now: string = new Date().toISOString();
+
+  public get endMin(): string {
+    return this.form.controls['startDate'].value ?? this.now;
+  }
 
   public closeModal(): void {
     this.modalCtrl.dismiss();
   }
 
   public async createNewRequest(): Promise<void> {
+    const rawFormValue = this.form.getRawValue();
     const request: NewTimeOffRequest = {
-      ...this.form.getRawValue(),
+      ...rawFormValue,
+      startDate: this.formatDate(rawFormValue.startDate),
+      endDate: this.formatDate(rawFormValue.endDate),
       employeeId: this.employeeId(),
     };
 
     await this.modalCtrl.dismiss(request);
+  }
+
+  private formatDate(inputDate: string): string {
+    const date = new Date(inputDate);
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())).toISOString();
   }
 
   private initializeForm(): FormGroup {
@@ -61,7 +79,14 @@ export class NewRequestModal {
       startDate: [ null, Validators.required ],
       endDate: [ null, Validators.required ],
       type: [ null, Validators.required ],
-      note: [ null ]
-    });
+      note: [ null, Validators.maxLength(300)  ]
+    },
+    {
+      validators: [
+        dateRangeValidator('startDate', 'endDate'),
+        maxDurationValidator('startDate', 'endDate', this.maxDuration)
+      ]
+    }
+    );
   }
 }

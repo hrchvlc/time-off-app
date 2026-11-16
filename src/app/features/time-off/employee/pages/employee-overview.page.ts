@@ -26,7 +26,7 @@ type Tab = 'upcoming' | 'past';
 export class EmployeeOverviewPage {
   private readonly modalController: ModalController = inject(ModalController);
   private readonly notificationService : NotificationService = inject(NotificationService);
-  private readonly today: string = new Date().toISOString();
+  private readonly today: string = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
 
   protected readonly activeTab: WritableSignal<Tab> = signal<Tab>('upcoming');
   protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal(mockTimeOffEmployeeRequests);
