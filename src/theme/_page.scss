@@ -1,5 +1,6 @@
-// Shared by the two list pages (My time off, Review): column, title row, segment, card list,
-// skeleton card and empty-state button. Each page adds its own bottom padding and skeleton shapes.
+// Shared by the two list pages (My time off, Review): column, title row, segment, card list.
+// Each page adds its own bottom padding and skeleton shapes.
+
 .column {
   box-sizing: border-box;
   max-width: 560px;
@@ -79,35 +80,4 @@ ion-segment-button {
   border-radius: var(--ui-radius-card);
   background: var(--ui-surface);
   box-shadow: 0 1px 2px rgb(20 33 61 / 6%);
-}
-
-ion-skeleton-text {
-  margin: 0;
-  border-radius: 6px;
-
-  // A request card's week strip: day numbers, then the 12px bar.
-  &.strip {
-    height: 12px;
-    margin-top: 34px;
-  }
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-ui-empty-state ion-button {
-  height: 48px;
-  font-size: 16px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ion-skeleton-text {
-    animation: none;
-  }
 }

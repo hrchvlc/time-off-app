@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.example.app',
-  appName: 'timeoff-app',
+  appId: 'com.timeoff.app',
+  appName: 'timeoff',
   webDir: 'dist/timeoff-app/browser'
 };
 

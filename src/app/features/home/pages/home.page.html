@@ -14,7 +14,7 @@
 
     <section class="demo">
       <h2 class="demo-heading">Login as</h2>
-        @for (account of demoAccounts(); track account.id) {
+        @for (account of demoAccounts; track account.id) {
           <ion-button (click)="chooseAccount(account.role)" color="primary">
             <div class="box">
             <img [src]="'assets/icons/' + ( account.role | lowercase) + '.svg#'" [alt]="'Avatar ' + account.role" class="box__img">

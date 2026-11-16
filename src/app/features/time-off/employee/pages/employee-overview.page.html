@@ -29,29 +29,28 @@
     @if (allRequests().length) {
       @if(activeTab() === 'upcoming') {
         @if (!upcomingRequests().length) {
-          <h2>empty</h2>
+         <app-empty-state title="No upcoming time off" message="You can create a new request below"></app-empty-state>
         }
         @for (request of upcomingRequests(); track request.id) {
           <app-request-card [timeOffRequest]="request"></app-request-card>
         }
       } @else if (activeTab() === 'past') {
           @if (!pastRequests().length) {
-            <h2>empty</h2>
+            <app-empty-state title="No history of time offs"></app-empty-state>
           }
           @for (request of pastRequests(); track request.id) {
             <app-request-card [timeOffRequest]="request"></app-request-card>
           }
       }
     } @else {
-      <h3>No upcoming time off</h3>
+         <app-empty-state title="Nothing to see here"></app-empty-state>
     }
   </div>
 </ion-content>
 
-@if (showNewRequest()) {
+@if (showNewRequestButton()) {
   <ion-footer class="cta">
     <ion-button expand="block" (click)="createNewRequest()">
-      <ion-icon slot="start" name="add" aria-hidden="true" />
       Request time off
     </ion-button>
   </ion-footer>

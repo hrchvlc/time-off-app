@@ -1,28 +1,13 @@
 @use '../../../../../theme/page';
 
 .column {
-  // Room for the last card to scroll clear of the footer's fade.
   padding-bottom: 28px;
-}
-
-ion-skeleton-text {
-  &.range {
-    width: 55%;
-    height: 22px;
-  }
-
-  &.sub {
-    width: 35%;
-    height: 16px;
-    margin-top: 8px;
-  }
 }
 
 .cta {
   padding: 8px max(16px, calc((100% - 528px) / 2)) calc(var(--ion-safe-area-bottom, 0px) + 16px);
   background: var(--ui-ground);
 
-  // Cards fade out under the button instead of meeting a hard edge.
   &::before {
     content: '';
     position: absolute;
