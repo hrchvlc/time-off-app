@@ -1,8 +1,7 @@
-import { Component, computed, inject, signal, Signal, WritableSignal } from '@angular/core';
-import { IonButton, IonContent, IonFooter, IonLabel, IonRefresher, IonRefresherContent, IonSegment, IonSegmentButton, ModalController, SegmentValue } from '@ionic/angular';
-import { EmptyStateComponent, NotificationService, RequestCardComponent, TimeOffRequest } from '@timeoff/shared';
+import { Component, computed, inject, OnInit, signal, Signal, WritableSignal } from '@angular/core';
+import { IonButton, IonContent, IonFooter, IonLabel, IonSegment, IonSegmentButton, IonSpinner, ModalController, SegmentValue } from '@ionic/angular';
+import { EmptyStateComponent, LocalStorageService, NotificationService, RequestCardComponent, TimeOffRequest } from '@timeoff/shared';
 import { NewRequestModal } from '../components';
-import { mockTimeOffEmployeeRequests } from './mock-employee-data.const';
 
 type Tab = 'upcoming' | 'past';
 
@@ -12,24 +11,25 @@ type Tab = 'upcoming' | 'past';
   styleUrls: ['./employee-overview.page.scss'],
   imports: [
     IonContent,
-    IonRefresher,
-    IonRefresherContent,
     IonSegment,
     IonSegmentButton,
     IonLabel,
     IonFooter,
     IonButton,
+    IonSpinner,
     RequestCardComponent,
     EmptyStateComponent,
   ]
 })
-export class EmployeeOverviewPage {
+export class EmployeeOverviewPage implements OnInit {
+  private readonly localStorageService: LocalStorageService = inject(LocalStorageService);
   private readonly modalController: ModalController = inject(ModalController);
   private readonly notificationService : NotificationService = inject(NotificationService);
   private readonly today: string = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
 
   protected readonly activeTab: WritableSignal<Tab> = signal<Tab>('upcoming');
-  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal(mockTimeOffEmployeeRequests);
+  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal([]);
+  protected readonly listLoading: WritableSignal<boolean> = signal(false);
 
   protected readonly upcomingRequests: Signal<TimeOffRequest[]> = computed(() =>
     this.allRequests()
@@ -55,6 +55,11 @@ export class EmployeeOverviewPage {
       return hasNoRequests || hasAllowance;
     });
 
+  public async ngOnInit(): Promise<void> {
+    this.listLoading.set(true);
+    await this.loadAllRequests();
+  }
+
   public changeActiveTab(value: SegmentValue | undefined): void {
     if (!value) {
       return;
@@ -66,23 +71,26 @@ export class EmployeeOverviewPage {
     const newRequestModal = await this.modalController.create({
       component: NewRequestModal,
       componentProps: {
-        employeeId: this.allRequests()[0].employeeId,
+        employee: this.allRequests()[0],
       },
     });
     await newRequestModal.present();
     const { data } = await newRequestModal.onWillDismiss();
     if (data) {
-      this.notificationService.success('Request successfully submitted.');
+      if (data === 'success') {
+        await this.loadAllRequests();
+        this.notificationService.success('Request successfully submitted.');
+      } else {
+        this.notificationService.error('Error has occured. Try again later.');
+      }
     }
+  }
 
-    // Place for request
-
-    // if (data?.status === 'created') {
-    //   this.notificationService.success('Request successfully submitted.');
-    // } else if (data?.status === 'failed') {
-    //   this.notificationService.success('Request not submitted.');
-    // } else {
-    //   this.notificationService.success('Error has occured. Try again later.');
-    // }
+  private async loadAllRequests(): Promise<void> {
+    const res = await this.localStorageService.loadEmployeeRequests();
+    if (res) {
+      this.allRequests.set(res);
+      this.listLoading.set(false);
+    }
   }
 }

@@ -6,4 +6,5 @@ export interface NewTimeOffRequest {
   note?: string;
   startDate: string;
   type: TimeOffType;
+  workingDays: number;
 }
