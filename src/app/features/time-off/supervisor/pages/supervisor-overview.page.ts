@@ -1,7 +1,6 @@
-import { Component, computed, inject, Signal, signal, WritableSignal } from '@angular/core';
-import { AlertController, IonContent, IonLabel, IonRefresher, IonRefresherContent, IonSegment, IonSegmentButton, SegmentValue } from '@ionic/angular';
-import { ChangeRequest, EmptyStateComponent, RequestCardComponent, TimeOffRequest, TypeOffRequestStatus } from '@timeoff/shared';
-import { mockTimeOffSupervisorRequests } from './mock-supervisor-data.const';
+import { Component, computed, inject, OnInit, Signal, signal, WritableSignal } from '@angular/core';
+import { AlertController, IonContent, IonLabel, IonSegment, IonSegmentButton, IonSpinner, SegmentValue } from '@ionic/angular';
+import { EmptyStateComponent, LocalStorageService, NotificationService, RequestCardComponent, TimeOffRequest, TypeOffRequestStatus } from '@timeoff/shared';
 
 type Tab = 'pending' | 'past';
 
@@ -14,17 +13,19 @@ type Tab = 'pending' | 'past';
     IonSegmentButton,
     IonSegment,
     IonLabel,
-    IonRefresher,
-    IonRefresherContent,
+    IonSpinner,
     RequestCardComponent,
     EmptyStateComponent
   ]
 })
-export class SupervisorOverviewPage {
+export class SupervisorOverviewPage implements OnInit {
   private readonly alertController: AlertController = inject(AlertController);
+  private readonly localStorageService: LocalStorageService = inject(LocalStorageService);
+  private readonly notificationService : NotificationService = inject(NotificationService);
 
   protected readonly activeTab: WritableSignal<Tab> = signal<Tab>('pending');
-  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal(mockTimeOffSupervisorRequests);
+  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal([]);
+  protected readonly listLoading: WritableSignal<boolean> = signal(false);
 
   protected readonly pendingRequests: Signal<TimeOffRequest[]> = computed(() =>
     this.allRequests()
@@ -40,6 +41,11 @@ export class SupervisorOverviewPage {
 
   public readonly TypeOffRequestStatus: typeof TypeOffRequestStatus = TypeOffRequestStatus;
 
+  public async ngOnInit(): Promise<void> {
+    this.listLoading.set(true);
+    await this.loadAllRequests();
+  }
+
   public changeActiveTab(value: SegmentValue | undefined): void {
     if (!value) {
       return;
@@ -47,7 +53,7 @@ export class SupervisorOverviewPage {
     this.activeTab.set(value as Tab);
   }
 
-  public async onChangeRequestStatus(changedRequest: ChangeRequest): Promise<void> {
+  public async onChangeRequestStatus(changedRequest: TimeOffRequest): Promise<void> {
     const status = this.determineStatus(changedRequest.status);
     const alert = await this.alertController.create({
       header: 'Confirm',
@@ -65,13 +71,25 @@ export class SupervisorOverviewPage {
       return;
     }
     if (role === 'confirm') {
-    // change status
-      // const changeRequest = changedRequest;
-
+      const res = await this.localStorageService.changeRequestStatus(changedRequest);
+      if (res?.status === 'success') {
+        this.notificationService.success('Status successfully updated.');
+        await this.loadAllRequests();
+      } else {
+        this.notificationService.error('Error has occured. Try again later.');
+      }
     }
   }
 
   private determineStatus(status: TypeOffRequestStatus): string {
     return status === TypeOffRequestStatus.Approved ?  status.toLowerCase().slice(0, -1) : status.toLowerCase().slice(0, -2);
+  }
+
+  private async loadAllRequests(): Promise<void> {
+    const res = await this.localStorageService.loadSupervisorRequests();
+    if (res) {
+      this.allRequests.set(res);
+      this.listLoading.set(false);
+    }
   }
 }
