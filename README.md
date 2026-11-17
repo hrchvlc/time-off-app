@@ -11,8 +11,8 @@ Built with **Ionic 9**, **Angular 22** (standalone components and signals) and *
 ### Install and run
 
 ```bash
-git clone https://github.com/hrchvlc/time-off-homework-app.git
-cd time-off-homework-app
+git clone https://github.com/hrchvlc/time-off-app.git
+cd time-off-app
 npm install
 npm start
 ```
@@ -79,3 +79,28 @@ npx ng test --watch=false
 ```bash
 npm run storybook
 ```
+
+---
+
+## Use of AI
+
+In line with the assignment guidelines, this section describes where AI was used. I used **Claude Code** as a coding assistant throughout the project.
+
+My workflow was to always start with my own approach first. I then used AI to review it or suggest alternatives, and adopted its suggestions only when they were more sound than my original solution.
+
+### AI-assisted work
+
+I built the following parts together with AI. I defined what was needed, reviewed the suggested code and adapted it to the project:
+
+- **Tests:** Vitest configuration and the unit and component tests listed in [Testing](#testing).
+- **Storybook:** Storybook configuration and the stories for `RequestCard`, `AllowanceSummary` and `EmptyState`.
+- **Mock API service:** the `localStorage`-based service that replaces a backend, including handling of missing or corrupted data.
+- **Design and CSS:** AI helped shape the visual design and CSS files. Some styling is based on its suggestions, which I then adjusted to fit the app.
+
+### AI as a technical reference
+
+- **Code review and refactoring:** I used AI to review my code and point out improvements in structure and best practices. I decided which suggestions to adopt and implemented the refactoring myself.
+
+### Independent work
+
+I designed and implemented the application architecture, features, pages, components myself.

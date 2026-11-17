@@ -20,7 +20,6 @@ import { TimeOffRequest, TimeOffRequestStatus } from '../../models';
 export class RequestCardComponent {
   public readonly timeOffRequest: InputSignal<TimeOffRequest> = input.required<TimeOffRequest>();
   public readonly isSupervisor: InputSignal<boolean> = input<boolean>(false);
-  // Disables the decision buttons while this request's decision is being saved
   public readonly busy: InputSignal<boolean> = input<boolean>(false);
 
   public readonly statusChanged: OutputEmitterRef<TimeOffRequest> = output<TimeOffRequest>();
