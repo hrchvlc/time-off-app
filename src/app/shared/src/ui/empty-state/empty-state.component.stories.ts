@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from "@storybook/angular-vite";
-import { EmptyStateComponent } from "./empty-state.component";
+import type { Meta, StoryObj } from '@storybook/angular-vite';
+import { EmptyStateComponent } from './empty-state.component';
 
 const meta: Meta<EmptyStateComponent> = {
-  title: "Shared/Empty state",
+  title: 'Shared/Empty state',
   component: EmptyStateComponent,
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   args: {
-    title: "No past requests",
+    title: 'No past requests',
   },
 };
 
@@ -18,7 +18,7 @@ export const TitleOnly: Story = {};
 
 export const WithMessage: Story = {
   args: {
-    title: "No pending requests",
-    message: "Your work is done",
+    title: 'No pending requests',
+    message: 'Your work is done',
   },
 };

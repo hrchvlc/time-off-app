@@ -1,23 +1,21 @@
-import { Account, Role } from "../models";
+import { Account, Role } from '../models';
 
 export const dummyAccounts: Account[] = [
   {
-    id: "emp-101",
-    name: "Anna Nováková",
+    id: 'emp-101',
+    name: 'Anna Nováková',
     role: Role.Employee,
     timeOffAllowance: 25,
-    timeOffSpent: 19,
   },
   {
-    id: "emp-103",
-    name: "Petra Černá",
+    id: 'emp-103',
+    name: 'Petra Černá',
     role: Role.Employee,
     timeOffAllowance: 25,
-    timeOffSpent: 0,
   },
   {
-    id: "emp-202",
-    name: "Lucie Králová",
+    id: 'emp-202',
+    name: 'Lucie Králová',
     role: Role.Supervisor,
-  }
+  },
 ];

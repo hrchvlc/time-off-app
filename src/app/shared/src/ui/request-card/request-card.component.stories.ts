@@ -1,25 +1,23 @@
-import type { Meta, StoryObj } from "@storybook/angular-vite";
-import { fn } from "storybook/test";
-import { mockTimeOffRequests } from "../../dummy-data";
-import { TimeOffRequest, TimeOffType, TypeOffRequestStatus } from "../../models";
-import { RequestCardComponent } from "./request-card.component";
+import type { Meta, StoryObj } from '@storybook/angular-vite';
+import { fn } from 'storybook/test';
+import { mockTimeOffRequests } from '../../dummy-data';
+import { TimeOffRequest, TimeOffRequestStatus, TimeOffType } from '../../models';
+import { RequestCardComponent } from './request-card.component';
 
 const approvedRequest: TimeOffRequest = mockTimeOffRequests[0];
 
 const pendingRequest: TimeOffRequest = {
   ...approvedRequest,
-  status: TypeOffRequestStatus.Pending,
-  decidedAt: undefined,
+  status: TimeOffRequestStatus.Pending,
   decidedByFullName: undefined,
   decisionNote: undefined,
 };
 
 const rejectedRequest: TimeOffRequest = {
   ...approvedRequest,
-  status: TypeOffRequestStatus.Rejected,
-  decidedAt: "2026-11-04T11:25:00.000Z",
-  decidedByFullName: "Lucie Králová",
-  decisionNote: "Overlaps with the year-end release. Please pick different dates.",
+  status: TimeOffRequestStatus.Rejected,
+  decidedByFullName: 'Lucie Králová',
+  decisionNote: 'Overlaps with the year-end release. Please pick different dates.',
 };
 
 /**
@@ -27,12 +25,13 @@ const rejectedRequest: TimeOffRequest = {
  * to see the supervisor version, which adds the employee's name.
  */
 const meta: Meta<RequestCardComponent> = {
-  title: "Shared/Request card",
+  title: 'Shared/Request card',
   component: RequestCardComponent,
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   args: {
     timeOffRequest: pendingRequest,
     isSupervisor: false,
+    busy: false,
     // Shows up in the Actions panel when Approve or Reject is clicked.
     statusChanged: fn(),
   },
@@ -57,8 +56,8 @@ export const SingleDayWithoutNote: Story = {
     timeOffRequest: {
       ...pendingRequest,
       type: TimeOffType.Personal,
-      startDate: "2026-11-27T09:15:00.000Z",
-      endDate: "2026-11-27T09:15:00.000Z",
+      startDate: '2026-11-27T09:15:00.000Z',
+      endDate: '2026-11-27T09:15:00.000Z',
       workingDays: 1,
       note: undefined,
     },
@@ -68,4 +67,9 @@ export const SingleDayWithoutNote: Story = {
 /** A pending request is the only case where the supervisor sees something different: Approve and Reject instead of the badge. */
 export const SupervisorDecision: Story = {
   args: { isSupervisor: true },
+};
+
+/** While the supervisor's decision is being saved, Approve and Reject are disabled so it cannot be sent twice. */
+export const SupervisorDecisionSaving: Story = {
+  args: { isSupervisor: true, busy: true },
 };

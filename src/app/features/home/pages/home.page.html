@@ -22,11 +22,12 @@
       <div class="accounts">
         @for (account of demoAccounts(); track account.id) {
           <button type="button" class="account" (click)="chooseAccount(account)">
-            <span class="avatar"
-                  role="img"
-                  [attr.aria-label]="'Avatar ' + account.role"
-                  [class.supervisor]="account.role === Role.Supervisor"
-                  [style.--icon]="'url(assets/icons/' + (account.role | lowercase) + '.svg)'"></span>
+            <span
+              class="avatar"
+              role="img"
+              [class.supervisor]="account.role === Role.Supervisor"
+              [style.--icon]="'url(assets/icons/' + (account.role | lowercase) + '.svg)'"
+            ></span>
             <span class="name">{{ account.name }}</span>
             <span class="role">{{ account.role }}</span>
           </button>

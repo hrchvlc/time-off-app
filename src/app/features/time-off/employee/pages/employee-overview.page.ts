@@ -1,5 +1,15 @@
 import { Component, computed, effect, inject, signal, Signal, untracked, WritableSignal } from '@angular/core';
-import { IonButton, IonContent, IonFooter, IonLabel, IonSegment, IonSegmentButton, IonSkeletonText, ModalController, SegmentValue } from '@ionic/angular';
+import {
+  IonButton,
+  IonContent,
+  IonFooter,
+  IonLabel,
+  IonSegment,
+  IonSegmentButton,
+  IonSkeletonText,
+  ModalController,
+  SegmentValue,
+} from '@ionic/angular';
 import {
   Account,
   AllowanceSummary,
@@ -33,17 +43,17 @@ type Tab = 'upcoming' | 'past';
     RequestCardComponent,
     EmptyStateComponent,
     AllowanceSummaryComponent,
-  ]
+  ],
 })
 export class EmployeeOverviewPage {
   private readonly localStorageService: LocalStorageService = inject(LocalStorageService);
   private readonly modalController: ModalController = inject(ModalController);
-  private readonly notificationService : NotificationService = inject(NotificationService);
+  private readonly notificationService: NotificationService = inject(NotificationService);
   private readonly today: WritableSignal<string> = signal(getLocalToday());
   private readonly account: WritableSignal<Account | undefined> = this.localStorageService.account;
 
   protected readonly activeTab: WritableSignal<Tab> = signal<Tab>('upcoming');
-  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal([]);
+  protected readonly allRequests: Signal<TimeOffRequest[]> = this.localStorageService.allRequests;
   protected readonly listLoading: WritableSignal<boolean> = signal(false);
 
   protected readonly upcomingRequests: Signal<TimeOffRequest[]> = computed(() =>
@@ -58,15 +68,19 @@ export class EmployeeOverviewPage {
       .sort((firstRequest, secondRequest) => secondRequest.endDate.localeCompare(firstRequest.endDate)),
   );
 
-  // No card for an account without an allowance.
   protected readonly allowanceSummary: Signal<AllowanceSummary | undefined> = computed(() => {
     const allowance = this.account()?.timeOffAllowance;
     return allowance ? summarizeAllowance(this.allRequests(), allowance) : undefined;
   });
 
-  protected readonly showNewRequestButton: Signal<boolean> = computed(() =>
-    this.activeTab() === 'upcoming' && !this.listLoading() && (this.allowanceSummary()?.left ?? 0) > 0,
+  protected readonly showNewRequestButton: Signal<boolean> = computed(
+    () => this.activeTab() === 'upcoming' && !this.listLoading(),
   );
+
+  protected readonly canRequestTimeOff: Signal<boolean> = computed(() => {
+    const summary = this.allowanceSummary();
+    return !summary || summary.left > 0;
+  });
 
   constructor() {
     effect(() => {
@@ -94,21 +108,17 @@ export class EmployeeOverviewPage {
     });
     await newRequestModal.present();
     const { data } = await newRequestModal.onWillDismiss();
-    if (data) {
-      if (data === 'success') {
-        await this.loadAllRequests();
-        this.notificationService.success('Request successfully submitted.');
-      } else {
-        this.notificationService.error('Error has occured. Try again later.');
-      }
+
+    if (data === 'success') {
+      this.notificationService.success('Request successfully submitted.');
     }
   }
 
   private async loadAllRequests(): Promise<void> {
     this.today.set(getLocalToday());
-    const res = await this.localStorageService.loadEmployeeRequests();
-    if (res) {
-      this.allRequests.set(res);
+    try {
+      await this.localStorageService.loadEmployeeRequests();
+    } finally {
       this.listLoading.set(false);
     }
   }

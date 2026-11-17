@@ -41,6 +41,16 @@ h2 {
   margin-top: 20px;
 }
 
+.form-error {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 20px;
+
+  &:empty {
+    margin-top: 0;
+  }
+}
+
 .label {
   margin: 0 2px 8px;
   color: var(--ui-ink-2);

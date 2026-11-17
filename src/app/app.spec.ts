@@ -12,11 +12,8 @@ describe('AppComponent', () => {
     vi.useFakeTimers();
 
     await TestBed.configureTestingModule({
-      imports: [ AppComponent ],
-      providers: [
-        provideRouter([]),
-        provideIonicAngular({ useSetInputAPI: true }),
-      ],
+      imports: [AppComponent],
+      providers: [provideRouter([]), provideIonicAngular({ useSetInputAPI: true })],
     }).compileComponents();
   });
 

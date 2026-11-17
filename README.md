@@ -8,7 +8,6 @@ Built with **Ionic 9**, **Angular 22** (standalone components and signals) and *
 
 ## Getting started
 
-
 ### Install and run
 
 ```bash
@@ -20,20 +19,22 @@ npm start
 
 Open http://localhost:4200
 
-
 ## Scripts
 
-| Command | Description |
-| --- | --- |
-| `npm start` | Start the dev server at http://localhost:4200 |
-| `npm run build` | Production build to `dist/timeoff-app` |
-| `npm test` | Run unit tests with Vitest in watch mode |
-| `npx ng test --watch=false` | Run the tests once |
-| `npm run lint` | Lint with ESLint |
-| `npm run storybook` | Start Storybook at http://localhost:6006 |
-| `npm run build-storybook` | Build a static Storybook to `storybook-static/` |
+| Command                     | Description                                     |
+| --------------------------- | ----------------------------------------------- |
+| `npm start`                 | Start the dev server at http://localhost:4200   |
+| `npm run build`             | Production build to `dist/timeoff-app`          |
+| `npm test`                  | Run unit tests with Vitest in watch mode        |
+| `npx ng test --watch=false` | Run the tests once                              |
+| `npm run lint`              | Lint with ESLint                                |
+| `npm run format`            | Format all files with Prettier                  |
+| `npm run format:check`      | Check formatting without changing files         |
+| `npm run storybook`         | Start Storybook at http://localhost:6006        |
+| `npm run build-storybook`   | Build a static Storybook to `storybook-static/` |
 
 ### Running on Android (optional)
+
 The project includes a Capacitor Android platform. With Android Studio installed:
 
 ```bash
@@ -48,16 +49,22 @@ npx cap open android
 
 Unit and component tests use **Vitest** through Angular's `@angular/build:unit-test` builder with jsdom.
 
-| Area | File |
-| --- | --- |
-| App shell / account switching | `app.spec.ts` |
-| New request modal (form, validation, submit) | `new-request.modal.spec.ts` |
-| Supervisor approve/reject with optional note | `supervisor-overview.page.spec.ts` |
-| Request card (supervisor note display) | `request-card.component.spec.ts` |
-| Mock API service (load, save, decision note, corrupted storage) | `local-storage.service.spec.ts` |
-| Date range validator | `date-range.validator.spec.ts` |
-| Max duration validator | `max-duration.validator.spec.ts` |
-| Date utilities | `date.util.spec.ts` |
+| Area                                                       | File                                  |
+| ---------------------------------------------------------- | ------------------------------------- |
+| App shell / account switching                              | `app.spec.ts`                         |
+| Role guard (wrong role or signed out is redirected)        | `role.guard.spec.ts`                  |
+| Employee overview ("Request time off" button, days left)   | `employee-overview.page.spec.ts`      |
+| New request modal (form, validation, note, submit)         | `new-request.modal.spec.ts`           |
+| Supervisor approve/reject with decider and optional note   | `supervisor-overview.page.spec.ts`    |
+| Request card (decider, supervisor note, decision buttons)  | `request-card.component.spec.ts`      |
+| Allowance summary (days left, used, pending, progress bar) | `allowance-summary.component.spec.ts` |
+| Mock API service (load, save, decision, corrupted storage) | `local-storage.service.spec.ts`       |
+| Date range validator (end before start)                    | `date-range.validator.spec.ts`        |
+| Working days validator (weekend-only requests)             | `working-days.validator.spec.ts`      |
+| Max duration validator                                     | `max-duration.validator.spec.ts`      |
+| Allowance validator (not enough days left)                 | `allowance.validator.spec.ts`         |
+| Allowance utility (used, pending and left days)            | `allowance.util.spec.ts`              |
+| Date utilities                                             | `date.util.spec.ts`                   |
 
 ```bash
 npx ng test --watch=false
@@ -67,7 +74,7 @@ npx ng test --watch=false
 
 ## Storybook
 
-`RequestCard` and `EmptyState` have stories covering each status and the employee and supervisor variants.
+`RequestCard`, `AllowanceSummary` and `EmptyState` have stories. The request card stories cover each status and the employee and supervisor variants.
 
 ```bash
 npm run storybook

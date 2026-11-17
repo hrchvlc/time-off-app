@@ -11,16 +11,12 @@
       <div class="group">
         <span class="label">Start date<ion-text color="danger">*</ion-text></span>
         <ion-datetime-button datetime="startDate">
-          <span slot="date-target" [class.placeholder]="!form.controls['startDate'].value">
-            {{ form.controls['startDate'].value
-            ? (form.controls['startDate'].value | date: 'MMM d, yy')
-            : 'Select date' }}
+          <span slot="date-target">
+            {{ form.controls.startDate.value ? (form.controls.startDate.value | date: 'MMM d, yy') : 'Select date' }}
           </span>
         </ion-datetime-button>
 
-        <ion-modal [keepContentsMounted]="true"
-                   [initialBreakpoint]="1"
-                   [breakpoints]="[0, 1]">
+        <ion-modal [keepContentsMounted]="true" [initialBreakpoint]="1" [breakpoints]="[0, 1]">
           <ng-template>
             <ion-datetime
               id="startDate"
@@ -37,16 +33,12 @@
       <div class="group">
         <span class="label">End date<ion-text color="danger">*</ion-text></span>
         <ion-datetime-button datetime="endDate">
-          <span slot="date-target" [class.placeholder]="!form.controls['endDate'].value">
-            {{ form.controls['endDate'].value
-            ? (form.controls['endDate'].value | date: 'MMM d, yy')
-            : 'Select date' }}
+          <span slot="date-target">
+            {{ form.controls.endDate.value ? (form.controls.endDate.value | date: 'MMM d, yy') : 'Select date' }}
           </span>
         </ion-datetime-button>
 
-        <ion-modal [keepContentsMounted]="true"
-                   [initialBreakpoint]="1"
-                   [breakpoints]="[0, 1]">
+        <ion-modal [keepContentsMounted]="true" [initialBreakpoint]="1" [breakpoints]="[0, 1]">
           <ng-template>
             <ion-datetime
               id="endDate"
@@ -61,8 +53,8 @@
       </div>
 
       <div class="group">
-        <ion-select placeholder="Select vacation type" formControlName="type">
-          <div slot="label" class="label">Vacation type<ion-text color="danger">*</ion-text></div>
+        <ion-select placeholder="Select type" formControlName="type">
+          <div slot="label" class="label">Type<ion-text color="danger">*</ion-text></div>
           @for (type of timeOffTypes; track $index) {
             <ion-select-option [value]="type">{{ type }}</ion-select-option>
           }
@@ -75,25 +67,31 @@
           labelPlacement="stacked"
           placeholder="Add a note"
           [rows]="3"
-          [maxlength]="300">
-            <div slot="label">Note <span>(optional)</span></div>
+          [maxlength]="300"
+        >
+          <div slot="label">Note <span>(optional)</span></div>
         </ion-textarea>
       </div>
     </form>
+
+    <div class="form-error" role="alert">
+      @if (form.hasError('endBeforeStart') && form.controls.endDate.dirty) {
+        <ion-text color="danger">End date can't be before the start date.</ion-text>
+      } @else if (form.hasError('noWorkingDays')) {
+        <ion-text color="danger">The selected dates fall on a weekend. Pick at least one working day.</ion-text>
+      } @else if (form.hasError('rangeTooLong')) {
+        <ion-text color="danger">
+          A request can't be longer than {{ form.getError('rangeTooLong').max }} days (you selected
+          {{ form.getError('rangeTooLong').actual }}).
+        </ion-text>
+      } @else if (form.getError('notEnoughDays'); as error) {
+        <ion-text color="danger">
+          You have only {{ error.left }} {{ error.left === 1 ? 'day' : 'days' }} off left (this request takes
+          {{ error.requested }} working days).
+        </ion-text>
+      }
+    </div>
   </div>
-  @if (form.hasError('endBeforeStart') && form.controls['endDate'].dirty) {
-    <ion-badge color="danger">End date can't be before the start date.</ion-badge>
-  } @else if (form.hasError('rangeTooLong')) {
-    <ion-badge color="danger">
-      A request can't be longer than {{ form.getError('rangeTooLong').max }} days
-      (you selected {{ form.getError('rangeTooLong').actual }}).
-    </ion-badge>
-  } @else if (form.getError('notEnoughDays'); as error) {
-    <ion-badge color="danger">
-      You have only {{ error.left }} {{ error.left === 1 ? 'day' : 'days' }} off left
-      (this request takes {{ error.requested }} working days).
-    </ion-badge>
-  }
 </ion-content>
 
 <ion-footer class="ion-no-border">

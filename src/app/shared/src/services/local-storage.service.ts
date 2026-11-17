@@ -1,6 +1,6 @@
 import { computed, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { dummyAccounts, mockTimeOffRequests } from '../dummy-data';
-import { Account, ApiResponse, TimeOffRequest } from '../models';
+import { Account, ApiResponse, TimeOffRequest, TimeOffRequestDecision } from '../models';
 
 const DELAY_MS = 800;
 const REQUESTS_KEY = 'timeOffRequests';
@@ -8,17 +8,17 @@ const REQUESTS_KEY = 'timeOffRequests';
 @Injectable({ providedIn: 'root' })
 export class LocalStorageService {
   public readonly pendingCalls: WritableSignal<number> = signal(0);
-  public readonly account: WritableSignal<Account | undefined> = signal<Account | undefined>(this.loadFromLocalStorage('account', undefined));
+  public readonly account: WritableSignal<Account | undefined> = signal<Account | undefined>(
+    this.loadFromLocalStorage('account', undefined),
+  );
   public readonly accounts: WritableSignal<Account[]> = signal<Account[]>([]);
-  public readonly employeeRequests: WritableSignal<TimeOffRequest[]> = signal<TimeOffRequest[]>([]);
-  public readonly supervisorRequests: WritableSignal<TimeOffRequest[]> = signal<TimeOffRequest[]>([]);
+  public readonly allRequests: WritableSignal<TimeOffRequest[]> = signal<TimeOffRequest[]>([]);
   public readonly isLoading: Signal<boolean> = computed(() => this.pendingCalls() > 0);
 
   public loadAccounts(): Promise<Account[]> {
     return this.simulate(() => {
-      const requests = this.loadFromLocalStorage('accounts', dummyAccounts);
-      this.accounts.set(requests);
-      return requests;
+      this.accounts.set(dummyAccounts);
+      return this.accounts();
     });
   }
 
@@ -28,7 +28,7 @@ export class LocalStorageService {
   public loadEmployeeRequests(): Promise<TimeOffRequest[]> {
     return this.simulate(() => {
       const requests = this.filterForEmployee(this.readRequests());
-      this.employeeRequests.set(requests);
+      this.allRequests.set(requests);
       return requests;
     });
   }
@@ -39,7 +39,7 @@ export class LocalStorageService {
   public loadSupervisorRequests(): Promise<TimeOffRequest[]> {
     return this.simulate(() => {
       const requests = this.readRequests();
-      this.supervisorRequests.set(requests);
+      this.allRequests.set(requests);
       return requests;
     });
   }
@@ -48,7 +48,11 @@ export class LocalStorageService {
    * Switch account
    */
   public changeAccount(account: Account): void {
+    if (account.id === this.account()?.id) {
+      return;
+    }
     this.account.set(account);
+    this.allRequests.set([]);
     this.saveToLocalStorage('account', account);
   }
 
@@ -57,6 +61,7 @@ export class LocalStorageService {
    */
   public clearAccount(): void {
     this.account.set(undefined);
+    this.allRequests.set([]);
     localStorage.removeItem('account');
   }
 
@@ -65,25 +70,41 @@ export class LocalStorageService {
    */
   public async addEmployeeRequest(newRequest: TimeOffRequest): Promise<ApiResponse> {
     return this.simulate(() => {
-      const updatedRequests = [ ...this.readRequests(), newRequest ];
-      this.saveToLocalStorage(REQUESTS_KEY, updatedRequests);
-      this.employeeRequests.set(this.filterForEmployee(updatedRequests));
-      return { status: 'success', error: '' };
+      const response = this.saveRequests([...this.readRequests(), newRequest]);
+      if (response.status === 'success') {
+        this.allRequests.update((requests) => [...requests, newRequest]);
+      }
+      return response;
     });
   }
 
   /**
-   * Edit request status, with an optional note from the supervisor, so the employee sees both
+   * Save a supervisor's decision on a request, so the employee sees the new status, who decided and the note
    */
-  public async changeRequestStatus(changedRequest: TimeOffRequest, decisionNote?: string): Promise<ApiResponse> {
+  public async changeRequestStatus(decision: TimeOffRequestDecision): Promise<ApiResponse> {
     return this.simulate(() => {
-      const updatedRequests = this.readRequests().map((request) =>
-        request.id === changedRequest.id ? { ...request, status: changedRequest.status, decisionNote } : request,
-      );
-      this.saveToLocalStorage(REQUESTS_KEY, updatedRequests);
-      this.supervisorRequests.set(updatedRequests);
-      return { status: 'success', error: '' };
+      const { requestId, status, decidedByFullName, decisionNote } = decision;
+      const applyDecision = (request: TimeOffRequest): TimeOffRequest =>
+        request.id === requestId ? { ...request, status, decidedByFullName, decisionNote } : request;
+      const response = this.saveRequests(this.readRequests().map(applyDecision));
+      if (response.status === 'success') {
+        this.allRequests.update((requests) => requests.map(applyDecision));
+      }
+      return response;
     });
+  }
+
+  /**
+   * Saving fails when storage is full or blocked; that comes back as an error response instead of a thrown error,
+   * so callers handle every failure in one place
+   */
+  private saveRequests(requests: TimeOffRequest[]): ApiResponse {
+    try {
+      this.saveToLocalStorage(REQUESTS_KEY, requests);
+      return { status: 'success', error: '' };
+    } catch {
+      return { status: 'error', error: 'Requests could not be saved.' };
+    }
   }
 
   /**
@@ -98,12 +119,12 @@ export class LocalStorageService {
   }
 
   private async simulate<T = void>(action: () => T, delayMs: number = DELAY_MS): Promise<T> {
-    this.pendingCalls.update(n => n + 1);
+    this.pendingCalls.update((n) => n + 1);
     try {
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
       return action();
     } finally {
-      this.pendingCalls.update(n => n - 1);
+      this.pendingCalls.update((n) => n - 1);
     }
   }
 

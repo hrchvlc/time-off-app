@@ -3,9 +3,9 @@ import { allowanceValidator } from './allowance.validator';
 
 describe('allowanceValidator', () => {
   // Monday to Friday: 5 working days.
-  const workWeek: [ string, string ] = [ '2026-11-16T10:00:00', '2026-11-20T10:00:00' ];
+  const workWeek: [string, string] = ['2026-11-16T10:00:00', '2026-11-20T10:00:00'];
 
-  function createForm([ startDate, endDate ]: [ string | null, string | null ], daysLeft: number | undefined): FormGroup {
+  function createForm([startDate, endDate]: [string | null, string | null], daysLeft: number | undefined): FormGroup {
     return new FormGroup(
       {
         startDate: new FormControl(startDate),
@@ -29,7 +29,7 @@ describe('allowanceValidator', () => {
 
   it('counts only working days, so a weekend in the range does not use the allowance', () => {
     // Friday to Monday: 2 working days.
-    const form = createForm([ '2026-11-20T10:00:00', '2026-11-23T10:00:00' ], 2);
+    const form = createForm(['2026-11-20T10:00:00', '2026-11-23T10:00:00'], 2);
 
     expect(form.hasError('notEnoughDays')).toBe(false);
   });
@@ -41,7 +41,7 @@ describe('allowanceValidator', () => {
   });
 
   it('does not check anything until both dates are chosen', () => {
-    const form = createForm([ workWeek[0], null ], 0);
+    const form = createForm([workWeek[0], null], 0);
 
     expect(form.hasError('notEnoughDays')).toBe(false);
   });

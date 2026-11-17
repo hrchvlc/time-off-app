@@ -7,7 +7,7 @@ describe('AllowanceSummaryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ AllowanceSummaryComponent ],
+      imports: [AllowanceSummaryComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AllowanceSummaryComponent);
