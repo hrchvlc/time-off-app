@@ -29,11 +29,12 @@ export class RequestCardComponent {
     switch (status) {
     case TypeOffRequestStatus.Approved:
       return 'primary';
+    case TypeOffRequestStatus.Pending:
+      return 'secondary';
     case TypeOffRequestStatus.Rejected:
     default:
       return 'tertiary';
     }
-
   }
 
   public changeStatus(status: TypeOffRequestStatus): void {

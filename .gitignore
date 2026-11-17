@@ -63,3 +63,7 @@ Thumbs.db
 *.jks
 *.keystore
 keystore.properties
+
+# Storybook
+storybook-static/
+*storybook.log

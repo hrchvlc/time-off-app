@@ -1,0 +1,57 @@
+@use 'mixins';
+
+.title {
+  margin: 0;
+  font-size: 44px;
+  font-weight: 800;
+  font-stretch: 76%;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.demo {
+  margin-top: 14px;
+}
+
+.demo-heading {
+  margin: 0 0 6px;
+  color: var(--ui-ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.name {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.role {
+  display: block;
+  margin-top: 1px;
+  color: var(--ui-ink-2);
+  font-size: 13px;
+}
+
+// Round role icon. Size it with --avatar-size; supervisors get a lighter navy.
+.avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: var(--avatar-size, 32px);
+  height: var(--avatar-size, 32px);
+  border-radius: 50%;
+  background: var(--ui-ink);
+  color: var(--ui-on-ink);
+
+  &::before {
+    content: '';
+    width: 60%;
+    height: 60%;
+    @include mixins.icon-mask;
+  }
+
+  &.supervisor {
+    background: var(--ui-supervisor);
+  }
+}

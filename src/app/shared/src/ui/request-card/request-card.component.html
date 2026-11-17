@@ -3,23 +3,15 @@
 <ion-card class="card">
   <ion-card-header>
     <ion-card-title>
-      <div class="flex-container">
-        <div>
-          <span>{{ request.startDate | date: 'MMM d, yy' }}</span>
-            @if (request.endDate !== request.startDate) {
-              <span> — {{ request.endDate | date: 'MMM d, yy' }}</span>
-            }
-        </div>
-        <div>
-          @if (!isSupervisor()) {
-            <span>{{ request.status }}</span>
-          }
-        </div>
+      <div>
+        <span>{{ request.startDate | date: 'MMM d, yy' }}</span>
+        @if (request.endDate !== request.startDate) {
+          <span> — {{ request.endDate | date: 'MMM d, yy' }}</span>
+        }
       </div>
       @if (isSupervisor()) {
         <span>{{ request.employeeFullName }}</span>
       }
-
     </ion-card-title>
     <ion-card-subtitle class="sub">
       <div class="flex-container">
@@ -31,21 +23,19 @@
 
   <ion-card-content>
     <div class="content">
-        @if (request.note) {
-          <span>{{ request.note }}</span>
-        }
-    </div>
-    @if (isSupervisor()) {
-      @if (request.status === TypeOffRequestStatus.Pending) {
-        <div class="flex-container">
-          <ion-button (click)="changeStatus(TypeOffRequestStatus.Rejected)" color="secondary">Reject</ion-button>
-          <ion-button (click)="changeStatus(TypeOffRequestStatus.Approved)">Approve</ion-button>
-        </div>
-      } @else {
-        <div class="flex-container flex-container__status">
-          <ion-badge [color]="getBadgeVariant(request.status)" class="status">{{ request.status }}</ion-badge>
-        </div>
+      @if (request.note) {
+        <span>{{ request.note }}</span>
       }
+    </div>
+    @if (isSupervisor() && request.status === TypeOffRequestStatus.Pending) {
+      <div class="flex-container">
+        <ion-button (click)="changeStatus(TypeOffRequestStatus.Rejected)" color="secondary">Reject</ion-button>
+        <ion-button (click)="changeStatus(TypeOffRequestStatus.Approved)">Approve</ion-button>
+      </div>
+    } @else {
+      <div class="flex-container flex-container__status">
+        <ion-badge [color]="getBadgeVariant(request.status)" class="status">{{ request.status }}</ion-badge>
+      </div>
     }
   </ion-card-content>
 </ion-card>

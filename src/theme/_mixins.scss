@@ -1,0 +1,27 @@
+// White rounded card, used by the request card and its loading placeholder.
+@mixin card-surface {
+  padding: 14px;
+  border-radius: var(--ui-radius-card);
+  background: var(--ui-surface);
+  box-shadow: 0 1px 2px rgb(20 33 61 / 6%);
+}
+
+// Sticky footer with one large button.
+@mixin footer-cta($gutter) {
+  padding: 8px max($gutter, calc((100% - #{560px - 2 * $gutter}) / 2)) calc(var(--ion-safe-area-bottom, 0px) + 16px);
+  background: var(--ui-ground);
+
+  ion-button {
+    --border-radius: 16px;
+    height: 52px;
+    margin: 0;
+    font-size: 17px;
+  }
+}
+
+// Draws the SVG in --icon in the current text colour.
+@mixin icon-mask {
+  background-color: currentColor;
+  -webkit-mask: var(--icon) no-repeat center / contain;
+          mask: var(--icon) no-repeat center / contain;
+}

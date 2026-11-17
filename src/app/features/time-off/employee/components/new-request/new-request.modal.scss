@@ -1,4 +1,4 @@
-@use '../../../../../../theme/fills';
+@use '../../../../../../theme/mixins';
 
 .container {
   max-width: 560px;
@@ -49,15 +49,7 @@ h2 {
 }
 
 ion-footer {
-  padding: 8px max(18px, calc((100% - 524px) / 2)) calc(var(--ion-safe-area-bottom, 0px) + 16px);
-  background: var(--ui-ground);
-
-  ion-button {
-    --border-radius: 16px;
-    height: 52px;
-    margin: 0;
-    font-size: 17px;
-  }
+  @include mixins.footer-cta(18px);
 }
 
 ion-datetime-button::part(native) {
@@ -82,7 +74,7 @@ ion-datetime-button::part(native):active {
 }
 
 ion-datetime-button::part(native):focus-visible {
-  outline: 2px solid var(--ui-vacation);
+  outline: var(--ui-focus-ring);
   outline-offset: 2px;
 }
 
@@ -112,4 +104,10 @@ ion-modal ion-datetime {
   @media (min-width: 768px) {
     width: 400px;
   }
+}
+
+.button-spinner {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
 }
