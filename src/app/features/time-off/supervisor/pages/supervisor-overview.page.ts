@@ -1,5 +1,5 @@
-import { Component, computed, inject, OnInit, Signal, signal, WritableSignal } from '@angular/core';
-import { AlertController, IonContent, IonLabel, IonSegment, IonSegmentButton, IonSpinner, SegmentValue } from '@ionic/angular';
+import { Component, computed, inject, Signal, signal, WritableSignal } from '@angular/core';
+import { AlertController, IonContent, IonLabel, IonSegment, IonSegmentButton, IonSkeletonText, SegmentValue, ViewWillEnter } from '@ionic/angular';
 import { EmptyStateComponent, LocalStorageService, NotificationService, RequestCardComponent, TimeOffRequest, TypeOffRequestStatus } from '@timeoff/shared';
 
 type Tab = 'pending' | 'past';
@@ -13,12 +13,12 @@ type Tab = 'pending' | 'past';
     IonSegmentButton,
     IonSegment,
     IonLabel,
-    IonSpinner,
+    IonSkeletonText,
     RequestCardComponent,
     EmptyStateComponent
   ]
 })
-export class SupervisorOverviewPage implements OnInit {
+export class SupervisorOverviewPage implements ViewWillEnter {
   private readonly alertController: AlertController = inject(AlertController);
   private readonly localStorageService: LocalStorageService = inject(LocalStorageService);
   private readonly notificationService : NotificationService = inject(NotificationService);
@@ -41,7 +41,7 @@ export class SupervisorOverviewPage implements OnInit {
 
   public readonly TypeOffRequestStatus: typeof TypeOffRequestStatus = TypeOffRequestStatus;
 
-  public async ngOnInit(): Promise<void> {
+  public async ionViewWillEnter(): Promise<void> {
     this.listLoading.set(true);
     await this.loadAllRequests();
   }
@@ -58,6 +58,14 @@ export class SupervisorOverviewPage implements OnInit {
     const alert = await this.alertController.create({
       header: 'Confirm',
       message: `Are you sure you want to ${status} this request?`,
+      inputs: [
+        {
+          name: 'decisionNote',
+          type: 'textarea',
+          placeholder: 'Add a note (optional)',
+          attributes: { maxlength: 126, 'aria-label': 'Note' },
+        },
+      ],
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         { text: `${status}`, role: 'confirm' },
@@ -66,17 +74,23 @@ export class SupervisorOverviewPage implements OnInit {
 
     await alert.present();
 
-    const { role } = await alert.onDidDismiss();
+    const { data, role } = await alert.onDidDismiss();
     if (role === 'cancel') {
       return;
     }
     if (role === 'confirm') {
-      const res = await this.localStorageService.changeRequestStatus(changedRequest);
-      if (res?.status === 'success') {
-        this.notificationService.success('Status successfully updated.');
-        await this.loadAllRequests();
-      } else {
-        this.notificationService.error('Error has occured. Try again later.');
+      this.listLoading.set(true);
+      try {
+        const decisionNote: string | undefined = data?.values?.decisionNote?.trim() || undefined;
+        const res = await this.localStorageService.changeRequestStatus(changedRequest, decisionNote);
+        if (res?.status === 'success') {
+          this.notificationService.success('Status successfully updated.');
+          await this.loadAllRequests();
+        } else {
+          this.notificationService.error('Error has occured. Try again later.');
+        }
+      } finally {
+        this.listLoading.set(false);
       }
     }
   }

@@ -1,23 +1,9 @@
-@use '../theme/fills';
+@use '../theme/accounts';
+@use '../theme/mixins';
 
-.title {
-  margin: 0;
-  font-size: 44px;
-  font-weight: 800;
-  font-stretch: 76%;
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-
-.demo {
-  margin-top: 14px;
-}
-
-.demo-heading {
-  margin: 0 0 6px;
-  color: var(--ui-ink-2);
-  font-size: 13px;
-  font-weight: 600;
+.page-container {
+  position: relative;
+  flex: 1;
 }
 
 ion-item {
@@ -58,41 +44,37 @@ ion-item {
 }
 
 .avatar {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
   margin: 0 12px 0 0;
-  border-radius: 50%;
-  background: var(--ui-ink);
-  color: var(--ui-on-ink);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-
-  &::before {
-    content: '';
-    width: 60%;
-    height: 60%;
-    background-color: currentColor;
-    -webkit-mask: var(--icon) no-repeat center / contain;
-            mask: var(--icon) no-repeat center / contain;
-  }
-
-  &.supervisor {
-    background: var(--ui-supervisor);
-  }
 }
 
-.name {
+.menu-body {
+  height: 100%;
+  overflow-y: auto;
+  padding: calc(var(--ion-safe-area-top, 0px) + 24px) 16px 16px;
+}
+
+a.title {
   display: block;
-  font-size: 16px;
-  font-weight: 600;
+  width: fit-content;
+  color: var(--ui-ink);
+  text-decoration: none;
+  border-radius: 6px;
+
+  &:focus-visible {
+    outline: var(--ui-focus-ring);
+    outline-offset: 4px;
+  }
 }
 
-.role {
-  display: block;
-  margin-top: 1px;
-  color: var(--ui-ink-2);
-  font-size: 13px;
+.demo {
+  margin-top: 28px;
 }
+
+.check {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  color: var(--ui-ink);
+  @include mixins.icon-mask;
+}
+

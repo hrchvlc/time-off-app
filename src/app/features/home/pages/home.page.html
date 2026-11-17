@@ -15,17 +15,23 @@
     <section class="demo">
       <h2 class="demo-heading">Login as</h2>
       @if (isLoading()) {
-        <ion-spinner></ion-spinner>
+        <div class="loading">
+          <ion-spinner name="crescent"></ion-spinner>
+        </div>
       }
+      <div class="accounts">
         @for (account of demoAccounts(); track account.id) {
-          <ion-button (click)="chooseAccount(account.role)" color="primary">
-            <div class="box">
-            <img [src]="'assets/icons/' + ( account.role | lowercase) + '.svg#'" [alt]="'Avatar ' + account.role" class="box__img">
+          <button type="button" class="account" (click)="chooseAccount(account)">
+            <span class="avatar"
+                  role="img"
+                  [attr.aria-label]="'Avatar ' + account.role"
+                  [class.supervisor]="account.role === Role.Supervisor"
+                  [style.--icon]="'url(assets/icons/' + (account.role | lowercase) + '.svg)'"></span>
             <span class="name">{{ account.name }}</span>
             <span class="role">{{ account.role }}</span>
-            </div>
-          </ion-button>
+          </button>
         }
+      </div>
     </section>
   </div>
 </ion-content>

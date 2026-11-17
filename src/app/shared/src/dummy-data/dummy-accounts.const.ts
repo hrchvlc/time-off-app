@@ -2,14 +2,22 @@ import { Account, Role } from "../models";
 
 export const dummyAccounts: Account[] = [
   {
-    id: "1234",
-    name: "Dummy Employee",
+    id: "emp-101",
+    name: "Anna Nováková",
     role: Role.Employee,
+    timeOffAllowance: 25,
+    timeOffSpent: 19,
   },
   {
-    id: "4321",
-    name: "Dummy Supervisor",
+    id: "emp-103",
+    name: "Petra Černá",
+    role: Role.Employee,
+    timeOffAllowance: 25,
+    timeOffSpent: 0,
+  },
+  {
+    id: "emp-202",
+    name: "Lucie Králová",
     role: Role.Supervisor,
-
   }
 ];

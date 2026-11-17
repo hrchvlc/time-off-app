@@ -1,4 +1,5 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { toCalendarDay } from '../utils';
 
 export function dateRangeValidator(startKey: string, endKey: string): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
@@ -9,9 +10,6 @@ export function dateRangeValidator(startKey: string, endKey: string): ValidatorF
       return null;
     }
 
-    const startDay = new Date(start).setHours(0, 0, 0, 0);
-    const endDay = new Date(end).setHours(0, 0, 0, 0);
-
-    return endDay >= startDay ? null : { endBeforeStart: true };
+    return toCalendarDay(end) >= toCalendarDay(start) ? null : { endBeforeStart: true };
   };
 }

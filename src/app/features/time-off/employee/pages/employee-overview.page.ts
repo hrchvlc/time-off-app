@@ -1,6 +1,19 @@
-import { Component, computed, inject, OnInit, signal, Signal, WritableSignal } from '@angular/core';
-import { IonButton, IonContent, IonFooter, IonLabel, IonSegment, IonSegmentButton, IonSpinner, ModalController, SegmentValue } from '@ionic/angular';
-import { EmptyStateComponent, LocalStorageService, NotificationService, RequestCardComponent, TimeOffRequest } from '@timeoff/shared';
+import { Component, computed, effect, inject, signal, Signal, untracked, WritableSignal } from '@angular/core';
+import { IonButton, IonContent, IonFooter, IonLabel, IonSegment, IonSegmentButton, IonSkeletonText, ModalController, SegmentValue } from '@ionic/angular';
+import {
+  Account,
+  AllowanceSummary,
+  AllowanceSummaryComponent,
+  EmptyStateComponent,
+  getLocalToday,
+  LocalStorageService,
+  NotificationService,
+  RequestCardComponent,
+  Role,
+  summarizeAllowance,
+  TimeOffRequest,
+  toCalendarDay,
+} from '@timeoff/shared';
 import { NewRequestModal } from '../components';
 
 type Tab = 'upcoming' | 'past';
@@ -16,16 +29,18 @@ type Tab = 'upcoming' | 'past';
     IonLabel,
     IonFooter,
     IonButton,
-    IonSpinner,
+    IonSkeletonText,
     RequestCardComponent,
     EmptyStateComponent,
+    AllowanceSummaryComponent,
   ]
 })
-export class EmployeeOverviewPage implements OnInit {
+export class EmployeeOverviewPage {
   private readonly localStorageService: LocalStorageService = inject(LocalStorageService);
   private readonly modalController: ModalController = inject(ModalController);
   private readonly notificationService : NotificationService = inject(NotificationService);
-  private readonly today: string = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+  private readonly today: WritableSignal<string> = signal(getLocalToday());
+  private readonly account: WritableSignal<Account | undefined> = this.localStorageService.account;
 
   protected readonly activeTab: WritableSignal<Tab> = signal<Tab>('upcoming');
   protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal([]);
@@ -33,31 +48,36 @@ export class EmployeeOverviewPage implements OnInit {
 
   protected readonly upcomingRequests: Signal<TimeOffRequest[]> = computed(() =>
     this.allRequests()
-      .filter((r) => r.endDate >= this.today)
-      .sort((a, b) => a.startDate.localeCompare(b.startDate)),
+      .filter((request) => toCalendarDay(request.endDate) >= this.today())
+      .sort((firstRequest, secondRequest) => firstRequest.startDate.localeCompare(secondRequest.startDate)),
   );
 
   protected readonly pastRequests: Signal<TimeOffRequest[]> = computed(() =>
     this.allRequests()
-      .filter((r) => r.endDate < this.today)
-      .sort((a, b) => b.endDate.localeCompare(a.endDate)),
+      .filter((request) => toCalendarDay(request.endDate) < this.today())
+      .sort((firstRequest, secondRequest) => secondRequest.endDate.localeCompare(firstRequest.endDate)),
   );
 
-  protected readonly showNewRequestButton: Signal<boolean> = computed(
-    () =>  {
-      if (this.activeTab() !== 'upcoming') {
-        return false;
+  // No card for an account without an allowance.
+  protected readonly allowanceSummary: Signal<AllowanceSummary | undefined> = computed(() => {
+    const allowance = this.account()?.timeOffAllowance;
+    return allowance ? summarizeAllowance(this.allRequests(), allowance) : undefined;
+  });
+
+  protected readonly showNewRequestButton: Signal<boolean> = computed(() =>
+    this.activeTab() === 'upcoming' && !this.listLoading() && (this.allowanceSummary()?.left ?? 0) > 0,
+  );
+
+  constructor() {
+    effect(() => {
+      if (this.account()?.role !== Role.Employee) {
+        return;
       }
-      const hasNoRequests = this.upcomingRequests().length === 0;
-      const firstRequest = this.upcomingRequests()[0];
-      const hasAllowance = !!firstRequest && firstRequest.timeOffSpent < firstRequest.timeOffAllowance;
-
-      return hasNoRequests || hasAllowance;
+      untracked(() => {
+        this.listLoading.set(true);
+        this.loadAllRequests();
+      });
     });
-
-  public async ngOnInit(): Promise<void> {
-    this.listLoading.set(true);
-    await this.loadAllRequests();
   }
 
   public changeActiveTab(value: SegmentValue | undefined): void {
@@ -70,9 +90,7 @@ export class EmployeeOverviewPage implements OnInit {
   protected async createNewRequest(): Promise<void> {
     const newRequestModal = await this.modalController.create({
       component: NewRequestModal,
-      componentProps: {
-        employee: this.allRequests()[0],
-      },
+      componentProps: { daysLeft: this.allowanceSummary()?.left },
     });
     await newRequestModal.present();
     const { data } = await newRequestModal.onWillDismiss();
@@ -87,6 +105,7 @@ export class EmployeeOverviewPage implements OnInit {
   }
 
   private async loadAllRequests(): Promise<void> {
+    this.today.set(getLocalToday());
     const res = await this.localStorageService.loadEmployeeRequests();
     if (res) {
       this.allRequests.set(res);

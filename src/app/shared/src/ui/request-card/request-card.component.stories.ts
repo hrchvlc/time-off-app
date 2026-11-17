@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/angular-vite";
 import { fn } from "storybook/test";
-import { mockTimeOffEmployeeRequests } from "../../dummy-data";
+import { mockTimeOffRequests } from "../../dummy-data";
 import { TimeOffRequest, TimeOffType, TypeOffRequestStatus } from "../../models";
 import { RequestCardComponent } from "./request-card.component";
 
-const approvedRequest: TimeOffRequest = mockTimeOffEmployeeRequests[0];
+const approvedRequest: TimeOffRequest = mockTimeOffRequests[0];
 
 const pendingRequest: TimeOffRequest = {
   ...approvedRequest,

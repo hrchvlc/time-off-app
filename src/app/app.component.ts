@@ -1,7 +1,18 @@
 import { LowerCasePipe } from '@angular/common';
-import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
-import { Router } from '@angular/router';
-import { IonApp, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonMenu, IonMenuButton, IonMenuToggle, IonRouterOutlet, IonSpinner, IonTitle, IonToolbar } from '@ionic/angular';
+import { Component, inject, OnInit, Signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import {
+  IonApp,
+  IonButtons,
+  IonHeader,
+  IonItem,
+  IonLabel,
+  IonMenu,
+  IonMenuButton,
+  IonMenuToggle,
+  IonRouterOutlet,
+  IonToolbar,
+} from '@ionic/angular';
 import { Account, LocalStorageService, Role } from '@timeoff/shared';
 
 @Component({
@@ -13,44 +24,29 @@ import { Account, LocalStorageService, Role } from '@timeoff/shared';
     IonRouterOutlet,
     IonHeader,
     IonToolbar,
-    IonHeader,
-    IonTitle,
     IonMenu,
-    IonContent,
     IonButtons,
     IonMenuButton,
     IonItem,
     IonLabel,
-    IonSpinner,
     IonMenuToggle,
-    LowerCasePipe
+    LowerCasePipe,
+    RouterLink,
   ],
 })
 export class AppComponent implements OnInit {
   private readonly localStorageService: LocalStorageService = inject(LocalStorageService);
   private readonly router: Router = inject(Router);
-  public readonly demoAccounts: WritableSignal<Account[] | undefined> = signal(undefined);
-  public readonly isLoading: WritableSignal<boolean> = signal(false);
+  public readonly demoAccounts: Signal<Account[]> = this.localStorageService.accounts.asReadonly();
+  public readonly activeAccount: Signal<Account | undefined> = this.localStorageService.account.asReadonly();
   public readonly Role: typeof Role = Role;
 
   public async ngOnInit(): Promise<void> {
-    await this.loadAllAccount();
+    await this.localStorageService.loadAccounts();
   }
 
-  public chooseAccount(chosenAccount: Role): void {
-    this.router.navigate([`${chosenAccount}`.toLowerCase() + '/overview']);
-  }
-
-  public returnHome(): void {
-    this.router.navigate(['/']);
-  }
-
-  private async loadAllAccount(): Promise<void> {
-    this.isLoading.set(true);
-    const res = await this.localStorageService.loadAccounts();
-    if (res) {
-      this.demoAccounts.set(res);
-      this.isLoading.set(false);
-    }
+  public chooseAccount(chosenAccount: Account): void {
+    this.localStorageService.changeAccount(chosenAccount);
+    this.router.navigate([`${chosenAccount.role}`.toLowerCase() + '/overview']);
   }
 }

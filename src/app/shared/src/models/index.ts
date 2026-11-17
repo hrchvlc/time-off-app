@@ -1,4 +1,5 @@
 export * from './account.interface';
+export * from './allowance-summary.interface';
 export * from './api-response.interface';
 export * from './new-timeoff-request.interface';
 export * from './role.enum';
