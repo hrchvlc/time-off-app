@@ -1,11 +1,61 @@
-@use '../../../../theme/fills';
+@use '../../../../theme/accounts';
+@use '../../../../theme/mixins';
 
-.box {
-  &__img {
-    width: 6rem;
+.accounts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.account {
+  @include mixins.card-surface;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px;
+  border: 0;
+  color: var(--ui-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ui-ease-out),
+    box-shadow 160ms var(--ui-ease-out);
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: var(--ui-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .avatar {
+    --avatar-size: 44px;
+    margin-bottom: 14px;
+  }
+
+  .name {
+    overflow-wrap: anywhere;
   }
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .account:hover {
+    box-shadow: 0 6px 16px rgb(20 33 61 / 10%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+}
 
 .column {
   box-sizing: border-box;
@@ -24,6 +74,7 @@
   }
 }
 
+// Logo: three calendar weeks with leave bars (solid, striped, crossed out).
 .mark {
   display: grid;
   gap: 6px;
@@ -46,31 +97,36 @@
 
 .vacation-ink {
   grid-column: 1 / 4;
-  @include fills.ink(var(--ui-vacation));
+  background-color: var(--ui-vacation);
 }
 
 .sick-pencil {
   grid-column: 3 / 6;
-  @include fills.pencil(var(--ui-sick));
+  background-color: var(--ui-surface);
+  background-image: repeating-linear-gradient(135deg, var(--ui-sick) 0 1.6px, transparent 1.6px 4.6px);
+  box-shadow: inset 0 0 0 1.5px var(--ui-sick);
 }
 
 .crossed {
   grid-column: 2 / 3;
-  @include fills.crossed(var(--ui-ink));
+  position: relative;
+  background-color: var(--ui-stroke);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: -4px;
+    top: 50%;
+    height: 1.6px;
+    border-radius: 1px;
+    background-color: var(--ui-ink);
+    transform: translateY(-50%) rotate(-6deg);
+  }
 }
 
 .personal-ink {
   grid-column: 5 / 6;
-  @include fills.ink(var(--ui-personal));
-}
-
-.title {
-  margin: 0;
-  font-size: 44px;
-  font-weight: 800;
-  font-stretch: 76%;
-  letter-spacing: -0.01em;
-  line-height: 1;
+  background-color: var(--ui-personal);
 }
 
 .lead {
@@ -80,26 +136,10 @@
   line-height: 1.4;
 }
 
-.demo {
-  margin-top: 14px;
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+  color: var(--ui-ink-3);
 }
 
-.demo-heading {
-  margin: 0 0 6px;
-  color: var(--ui-ink-2);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.name {
-  display: block;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.role {
-  display: block;
-  margin-top: 1px;
-  color: var(--ui-ink-2);
-  font-size: 13px;
-}

@@ -1,4 +1,4 @@
-@use '../../../../../theme/variables';
+@use '../../../../../theme/mixins';
 
 :host {
   display: block;
@@ -14,10 +14,7 @@
 }
 
 .card {
-  padding: 14px;
-  border-radius: var(--ui-radius-card);
-  background: var(--ui-surface);
-  box-shadow: 0 1px 2px rgb(20 33 61 / 6%);
+  @include mixins.card-surface;
   color: var(--ui-ink);
 }
 

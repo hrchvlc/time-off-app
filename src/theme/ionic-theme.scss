@@ -1,4 +1,4 @@
-// Maps the design tokens (theme/tokens.css) onto Ionic's variables.
+// Maps the design tokens (theme/_variables.scss) onto Ionic's variables.
 
 :root {
   --ion-font-family: var(--ui-font);
@@ -39,9 +39,8 @@
   --ion-color-danger-tint: #bc392f;
 }
 
-// Fields: label above a white box with an ink focus ring. ion-input and ion-textarea use scoped
-// (not shadow) styles, so their inner parts can only be reached from global CSS.
-ion-input,
+// Fields: label above a white box with an ink focus ring. ion-textarea uses scoped
+// (not shadow) styles, so its inner parts can only be reached from global CSS.
 ion-textarea {
   --highlight-color-focused: var(--ui-vacation);
   --placeholder-color: var(--ui-ink-2);
@@ -74,22 +73,6 @@ ion-textarea {
       inset 0 0 0 1.5px var(--ui-ink),
       0 0 0 4px rgb(42 111 219 / 14%);
   }
-
-  // Set by the page when it shows the field's error message.
-  &.field-invalid .native-wrapper {
-    box-shadow: inset 0 0 0 1.5px var(--ion-color-danger);
-  }
-
-  &.field-invalid.has-focus .native-wrapper {
-    box-shadow:
-      inset 0 0 0 1.5px var(--ion-color-danger),
-      0 0 0 4px rgb(180 35 24 / 14%);
-  }
-}
-
-// The header grey is too faint by default; the mode class outranks Ionic's scoped host rule.
-ion-action-sheet.ios {
-  --color: var(--ui-ink-2);
 }
 
 ion-button {
@@ -107,19 +90,18 @@ ion-button {
 
 ion-button.ion-focused {
   border-radius: var(--border-radius);
-  outline: 2px solid var(--ui-vacation);
+  outline: var(--ui-focus-ring);
   outline-offset: 2px;
 }
 
 // ion-list clips anything outside the row, so the ring sits inside it.
 ion-item.ion-focused {
-  outline: 2px solid var(--ui-vacation);
+  outline: var(--ui-focus-ring);
   outline-offset: -2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   ion-button,
-  ion-input .native-wrapper,
   ion-textarea .native-wrapper {
     transition: none;
   }
