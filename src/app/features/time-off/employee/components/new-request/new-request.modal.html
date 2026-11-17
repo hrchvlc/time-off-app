@@ -27,7 +27,7 @@
               formControlName="startDate"
               presentation="date"
               [firstDayOfWeek]="1"
-              [min]="now"
+              [min]="today"
               [showDefaultButtons]="true"
             ></ion-datetime>
           </ng-template>
@@ -76,23 +76,33 @@
           placeholder="Add a note"
           [rows]="3"
           [maxlength]="300">
-            <div slot="label">Note <span class="optional">(optional)</span></div>
+            <div slot="label">Note <span>(optional)</span></div>
         </ion-textarea>
       </div>
     </form>
   </div>
   @if (form.hasError('endBeforeStart') && form.controls['endDate'].dirty) {
-    <ion-badge color="danger" class="error">End date can't be before the start date.</ion-badge>
+    <ion-badge color="danger">End date can't be before the start date.</ion-badge>
   } @else if (form.hasError('rangeTooLong')) {
-    <ion-badge color="danger" class="error">
+    <ion-badge color="danger">
       A request can't be longer than {{ form.getError('rangeTooLong').max }} days
       (you selected {{ form.getError('rangeTooLong').actual }}).
+    </ion-badge>
+  } @else if (form.getError('notEnoughDays'); as error) {
+    <ion-badge color="danger">
+      You have only {{ error.left }} {{ error.left === 1 ? 'day' : 'days' }} off left
+      (this request takes {{ error.requested }} working days).
     </ion-badge>
   }
 </ion-content>
 
 <ion-footer class="ion-no-border">
-  <ion-button expand="block" (click)="createNewRequest()" [disabled]="!form.valid">
+  <ion-button expand="block" (click)="createNewRequest()" [disabled]="!form.valid || isSubmitting()">
+    @if (isSubmitting()) {
+      <ion-spinner name="crescent" slot="start" class="button-spinner"></ion-spinner>
+      Sending…
+    } @else {
       Send request
+    }
   </ion-button>
 </ion-footer>

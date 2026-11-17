@@ -1,0 +1,27 @@
+@let days = summary();
+
+<section class="summary" aria-labelledby="allowance-summary-title">
+  <div class="head">
+    <h2 class="label" id="allowance-summary-title">Days off</h2>
+    <p class="left">
+      <span class="left__value">{{ days.left }}</span>
+      left of {{ days.allowance }}
+    </p>
+  </div>
+
+  <div class="bar" aria-hidden="true">
+    <span class="bar__used" [style.width.%]="usedPercent()"></span>
+    <span class="bar__pending" [style.width.%]="pendingPercent()"></span>
+  </div>
+
+  <dl class="legend">
+    <div class="legend__item">
+      <dt><span class="dot dot--used" aria-hidden="true"></span>Used</dt>
+      <dd class="legend__used">{{ days.used }}</dd>
+    </div>
+    <div class="legend__item">
+      <dt><span class="dot dot--pending" aria-hidden="true"></span>Pending</dt>
+      <dd class="legend__pending">{{ days.pending }}</dd>
+    </div>
+  </dl>
+</section>

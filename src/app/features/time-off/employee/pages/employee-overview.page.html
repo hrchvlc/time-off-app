@@ -4,46 +4,64 @@
       <h1 class="title">My time off</h1>
     </header>
 
-    @if (listLoading()) {
-      <ion-spinner></ion-spinner>
-    } @else {
-      <ion-segment [value]="activeTab()" (ionChange)="changeActiveTab($event.detail.value)">
-        <ion-segment-button value="upcoming">
-          <ion-label>Upcoming
-            @if (allRequests().length) {
-              <span class="count">{{ upcomingRequests().length }}</span>
-            }
-          </ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="past">
-          <ion-label>
-            Past
-             @if (allRequests().length) {
-              <span class="count">{{ pastRequests().length }}</span>
-            }
-          </ion-label>
-        </ion-segment-button>
-      </ion-segment>
-
-      @if (allRequests().length) {
-        @if(activeTab() === 'upcoming') {
-          @if (!upcomingRequests().length) {
-           <app-empty-state title="No upcoming time off" message="You can create a new request below"></app-empty-state>
-          }
-          @for (request of upcomingRequests(); track request.id) {
-            <app-request-card [timeOffRequest]="request"></app-request-card>
-          }
-        } @else if (activeTab() === 'past') {
-            @if (!pastRequests().length) {
-              <app-empty-state title="No history of time offs"></app-empty-state>
-            }
-            @for (request of pastRequests(); track request.id) {
-              <app-request-card [timeOffRequest]="request"></app-request-card>
-            }
-        }
+    @if (allowanceSummary(); as summary) {
+      @if (listLoading()) {
+        <div class="card summary-placeholder" aria-hidden="true">
+          <ion-skeleton-text [animated]="true" class="skeleton skeleton--title"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" class="skeleton skeleton--bar"></ion-skeleton-text>
+          <ion-skeleton-text [animated]="true" class="skeleton skeleton--subtitle"></ion-skeleton-text>
+        </div>
       } @else {
-           <app-empty-state title="Nothing to see here"></app-empty-state>
+        <app-allowance-summary class="summary" [summary]="summary"></app-allowance-summary>
       }
+    }
+
+    <ion-segment [value]="activeTab()" (ionChange)="changeActiveTab($event.detail.value)">
+      <ion-segment-button value="upcoming">
+        <ion-label>Upcoming
+          @if (allRequests().length) {
+            <span class="count">{{ upcomingRequests().length }}</span>
+          }
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="past">
+        <ion-label>
+          Past
+          @if (allRequests().length) {
+            <span class="count">{{ pastRequests().length }}</span>
+          }
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    @if (listLoading()) {
+      <div class="list" aria-busy="true" aria-label="Loading requests">
+        @for (placeholder of [1, 2, 3]; track placeholder) {
+          <div class="card" aria-hidden="true">
+            <ion-skeleton-text [animated]="true" class="skeleton skeleton--title"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" class="skeleton skeleton--subtitle"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" class="skeleton skeleton--note"></ion-skeleton-text>
+          </div>
+        }
+      </div>
+    } @else if (allRequests().length) {
+      @if (activeTab() === 'upcoming') {
+        @if (!upcomingRequests().length) {
+          <app-empty-state title="No upcoming time off" message="You can create a new request below"></app-empty-state>
+        }
+        @for (request of upcomingRequests(); track request.id) {
+          <app-request-card [timeOffRequest]="request"></app-request-card>
+        }
+      } @else if (activeTab() === 'past') {
+        @if (!pastRequests().length) {
+          <app-empty-state title="No history of time offs"></app-empty-state>
+        }
+        @for (request of pastRequests(); track request.id) {
+          <app-request-card [timeOffRequest]="request"></app-request-card>
+        }
+      }
+    } @else {
+      <app-empty-state title="No requests yet"></app-empty-state>
     }
   </div>
 </ion-content>
@@ -55,4 +73,3 @@
     </ion-button>
   </ion-footer>
 }
-

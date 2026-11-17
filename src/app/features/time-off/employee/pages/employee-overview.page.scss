@@ -1,6 +1,16 @@
 @use '../../../../../theme/mixins';
 @use '../../../../../theme/page';
 
+.summary,
+.summary-placeholder {
+  margin-bottom: 16px;
+}
+
+.skeleton--bar {
+  height: 8px;
+  margin: 18px 0 12px;
+}
+
 .cta {
   @include mixins.footer-cta(16px);
 

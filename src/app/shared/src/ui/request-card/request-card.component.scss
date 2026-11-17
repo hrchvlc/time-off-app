@@ -16,6 +16,11 @@
 .card {
   @include mixins.card-surface;
   color: var(--ui-ink);
+
+  &--rejected {
+    background: var(--ui-surface-muted);
+    box-shadow: inset 0 0 0 1px var(--ui-line);
+  }
 }
 
 .sub {
@@ -29,6 +34,17 @@
 .content {
   display: flex;
   flex-direction: column;
+}
+
+.decision-note {
+  margin: 0.5rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--ui-ink-2);
+  color: var(--ui-ink-2);
+
+  &__author {
+    font-weight: 600;
+  }
 }
 
 .status {

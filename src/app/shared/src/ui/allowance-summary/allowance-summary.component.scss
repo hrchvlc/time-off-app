@@ -1,0 +1,96 @@
+@use '../../../../../theme/mixins';
+
+:host {
+  display: block;
+}
+
+.summary {
+  @include mixins.card-surface;
+  color: var(--ui-ink);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.label {
+  margin: 0;
+  color: var(--ui-ink-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.left {
+  margin: 0;
+  color: var(--ui-ink-2);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+
+  &__value {
+    color: var(--ui-ink);
+    font-size: 28px;
+    font-weight: 800;
+    font-stretch: 76%;
+    line-height: 1;
+  }
+}
+
+.bar {
+  display: flex;
+  height: 8px;
+  margin: 12px 0 10px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--ui-well);
+
+  &__used {
+    background: var(--ui-vacation);
+  }
+
+  &__pending {
+    background: rgb(42 111 219 / 35%);
+  }
+}
+
+.legend {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  color: var(--ui-ink-2);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+
+  &__item {
+    display: flex;
+    gap: 6px;
+  }
+
+  dt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ui-ink);
+    font-weight: 600;
+  }
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  &--used {
+    background: var(--ui-vacation);
+  }
+
+  &--pending {
+    background: rgb(42 111 219 / 35%);
+  }
+}

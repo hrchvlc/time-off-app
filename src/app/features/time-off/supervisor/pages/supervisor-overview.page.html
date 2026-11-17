@@ -4,47 +4,52 @@
       <h1 class="title">Team requests</h1>
     </header>
 
+    <ion-segment [value]="activeTab()" (ionChange)="changeActiveTab($event.detail.value)">
+      <ion-segment-button value="pending">
+        <ion-label>Pending
+          @if (allRequests().length) {
+            <span class="count">{{ pendingRequests().length }}</span>
+          }
+        </ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="past">
+        <ion-label>
+          Past
+          @if (allRequests().length) {
+            <span class="count">{{ pastRequests().length }}</span>
+          }
+        </ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
     @if (listLoading()) {
-      <ion-spinner></ion-spinner>
-    } @else {
-      <ion-segment [value]="activeTab()" (ionChange)="changeActiveTab($event.detail.value)">
-        <ion-segment-button value="pending">
-          <ion-label>Pending
-            @if (allRequests().length) {
-              <span class="count">{{ pendingRequests().length }}</span>
-            }
-          </ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="past">
-          <ion-label>
-            Past
-             @if (allRequests().length) {
-              <span class="count">{{ pastRequests().length }}</span>
-            }
-          </ion-label>
-        </ion-segment-button>
-      </ion-segment>
-
-      @if (allRequests().length) {
-        @if(activeTab() === 'pending') {
-          @if (!pendingRequests().length) {
-            <app-empty-state title="No pending requests" message="Your work is done"></app-empty-state>
-          }
-          @for (request of pendingRequests(); track request.id) {
-            <app-request-card [timeOffRequest]="request" [isSupervisor]="true" (statusChanged)="onChangeRequestStatus($event)"></app-request-card>
-          }
-        } @else if (activeTab() === 'past') {
-            @if (!pastRequests().length) {
-              <app-empty-state title="No past requests"></app-empty-state>
-            }
-            @for (request of pastRequests(); track request.id) {
-              <app-request-card [timeOffRequest]="request" [isSupervisor]="true"></app-request-card>
-            }
+      <div class="list" aria-busy="true" aria-label="Loading requests">
+        @for (placeholder of [1, 2, 3]; track placeholder) {
+          <div class="card" aria-hidden="true">
+            <ion-skeleton-text [animated]="true" class="skeleton skeleton--title"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" class="skeleton skeleton--subtitle"></ion-skeleton-text>
+            <ion-skeleton-text [animated]="true" class="skeleton skeleton--note"></ion-skeleton-text>
+          </div>
         }
-      } @else {
-        <app-empty-state title="No team requests"></app-empty-state>
+      </div>
+    } @else if (allRequests().length) {
+      @if (activeTab() === 'pending') {
+        @if (!pendingRequests().length) {
+          <app-empty-state title="No pending requests" message="Your work is done"></app-empty-state>
+        }
+        @for (request of pendingRequests(); track request.id) {
+          <app-request-card [timeOffRequest]="request" [isSupervisor]="true" (statusChanged)="onChangeRequestStatus($event)"></app-request-card>
+        }
+      } @else if (activeTab() === 'past') {
+        @if (!pastRequests().length) {
+          <app-empty-state title="No past requests"></app-empty-state>
+        }
+        @for (request of pastRequests(); track request.id) {
+          <app-request-card [timeOffRequest]="request" [isSupervisor]="true"></app-request-card>
+        }
       }
+    } @else {
+      <app-empty-state title="No team requests"></app-empty-state>
     }
-
   </div>
 </ion-content>

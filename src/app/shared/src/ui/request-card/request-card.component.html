@@ -1,6 +1,6 @@
 @let request = timeOffRequest();
 
-<ion-card class="card">
+<ion-card class="card" [class.card--rejected]="request.status === TypeOffRequestStatus.Rejected">
   <ion-card-header>
     <ion-card-title>
       <div>
@@ -25,6 +25,12 @@
     <div class="content">
       @if (request.note) {
         <span>{{ request.note }}</span>
+      }
+      @if (request.decisionNote) {
+        <p class="decision-note">
+          <span class="decision-note__author">{{ request.decidedByFullName ?? 'Supervisor' }}:</span>
+          {{ request.decisionNote }}
+        </p>
       }
     </div>
     @if (isSupervisor() && request.status === TypeOffRequestStatus.Pending) {
