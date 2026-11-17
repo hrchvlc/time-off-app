@@ -1,11 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/angular-vite";
-import { AllowanceSummaryComponent } from "./allowance-summary.component";
-
+import type { Meta, StoryObj } from '@storybook/angular-vite';
+import { AllowanceSummaryComponent } from './allowance-summary.component';
 
 const meta: Meta<AllowanceSummaryComponent> = {
-  title: "Shared/Allowance summary",
+  title: 'Shared/Allowance summary',
   component: AllowanceSummaryComponent,
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   args: {
     summary: { allowance: 25, used: 19, pending: 5, left: 1 },
   },

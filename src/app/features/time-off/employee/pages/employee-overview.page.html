@@ -18,7 +18,8 @@
 
     <ion-segment [value]="activeTab()" (ionChange)="changeActiveTab($event.detail.value)">
       <ion-segment-button value="upcoming">
-        <ion-label>Upcoming
+        <ion-label
+          >Upcoming
           @if (allRequests().length) {
             <span class="count">{{ upcomingRequests().length }}</span>
           }
@@ -47,17 +48,26 @@
     } @else if (allRequests().length) {
       @if (activeTab() === 'upcoming') {
         @if (!upcomingRequests().length) {
-          <app-empty-state title="No upcoming time off" message="You can create a new request below"></app-empty-state>
-        }
-        @for (request of upcomingRequests(); track request.id) {
-          <app-request-card [timeOffRequest]="request"></app-request-card>
+          <app-empty-state
+            title="No upcoming time off"
+            [message]="canRequestTimeOff() ? 'You can create a new request below' : undefined"
+          ></app-empty-state>
+        } @else {
+          <div class="list">
+            @for (request of upcomingRequests(); track request.id) {
+              <app-request-card [timeOffRequest]="request"></app-request-card>
+            }
+          </div>
         }
       } @else if (activeTab() === 'past') {
         @if (!pastRequests().length) {
           <app-empty-state title="No history of time offs"></app-empty-state>
-        }
-        @for (request of pastRequests(); track request.id) {
-          <app-request-card [timeOffRequest]="request"></app-request-card>
+        } @else {
+          <div class="list">
+            @for (request of pastRequests(); track request.id) {
+              <app-request-card [timeOffRequest]="request"></app-request-card>
+            }
+          </div>
         }
       }
     } @else {
@@ -68,7 +78,7 @@
 
 @if (showNewRequestButton()) {
   <ion-footer class="cta">
-    <ion-button expand="block" (click)="createNewRequest()">
+    <ion-button expand="block" (click)="createNewRequest()" [disabled]="!canRequestTimeOff()">
       Request time off
     </ion-button>
   </ion-footer>

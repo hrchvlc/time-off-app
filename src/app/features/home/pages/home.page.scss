@@ -64,8 +64,7 @@
   max-width: 420px;
   min-height: 100%;
   margin: 0 auto;
-  padding: calc(var(--ion-safe-area-top, 0px) + 40px) 22px
-    calc(var(--ion-safe-area-bottom, 0px) + 32px);
+  padding: calc(var(--ion-safe-area-top, 0px) + 40px) 22px calc(var(--ion-safe-area-bottom, 0px) + 32px);
 }
 
 @media (min-width: 768px) and (min-height: 720px) {
@@ -142,4 +141,3 @@
   padding: 32px 0;
   color: var(--ui-ink-3);
 }
-

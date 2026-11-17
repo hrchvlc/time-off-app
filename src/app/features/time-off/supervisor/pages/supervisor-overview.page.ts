@@ -1,6 +1,23 @@
-import { Component, computed, inject, Signal, signal, WritableSignal } from '@angular/core';
-import { AlertController, IonContent, IonLabel, IonSegment, IonSegmentButton, IonSkeletonText, SegmentValue, ViewWillEnter } from '@ionic/angular';
-import { EmptyStateComponent, LocalStorageService, NotificationService, RequestCardComponent, TimeOffRequest, TypeOffRequestStatus } from '@timeoff/shared';
+import { Component, computed, effect, inject, Signal, signal, untracked, WritableSignal } from '@angular/core';
+import {
+  AlertController,
+  IonContent,
+  IonLabel,
+  IonSegment,
+  IonSegmentButton,
+  IonSkeletonText,
+  SegmentValue,
+} from '@ionic/angular';
+import {
+  EmptyStateComponent,
+  LocalStorageService,
+  NotificationService,
+  RequestCardComponent,
+  Role,
+  TimeOffRequest,
+  TimeOffRequestDecision,
+  TimeOffRequestStatus,
+} from '@timeoff/shared';
 
 type Tab = 'pending' | 'past';
 
@@ -15,35 +32,41 @@ type Tab = 'pending' | 'past';
     IonLabel,
     IonSkeletonText,
     RequestCardComponent,
-    EmptyStateComponent
-  ]
+    EmptyStateComponent,
+  ],
 })
-export class SupervisorOverviewPage implements ViewWillEnter {
+export class SupervisorOverviewPage {
   private readonly alertController: AlertController = inject(AlertController);
   private readonly localStorageService: LocalStorageService = inject(LocalStorageService);
-  private readonly notificationService : NotificationService = inject(NotificationService);
+  private readonly notificationService: NotificationService = inject(NotificationService);
 
   protected readonly activeTab: WritableSignal<Tab> = signal<Tab>('pending');
-  protected readonly allRequests: WritableSignal<TimeOffRequest[]> = signal([]);
+  protected readonly allRequests: Signal<TimeOffRequest[]> = this.localStorageService.allRequests;
   protected readonly listLoading: WritableSignal<boolean> = signal(false);
+  protected readonly savingRequestId: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
 
   protected readonly pendingRequests: Signal<TimeOffRequest[]> = computed(() =>
     this.allRequests()
-      .filter((r) => r.status === TypeOffRequestStatus.Pending)
+      .filter((r) => r.status === TimeOffRequestStatus.Pending)
       .sort((a, b) => b.endDate.localeCompare(a.endDate)),
   );
 
   protected readonly pastRequests: Signal<TimeOffRequest[]> = computed(() =>
     this.allRequests()
-      .filter((r) => r.status !== TypeOffRequestStatus.Pending)
+      .filter((r) => r.status !== TimeOffRequestStatus.Pending)
       .sort((a, b) => b.endDate.localeCompare(a.endDate)),
   );
 
-  public readonly TypeOffRequestStatus: typeof TypeOffRequestStatus = TypeOffRequestStatus;
-
-  public async ionViewWillEnter(): Promise<void> {
-    this.listLoading.set(true);
-    await this.loadAllRequests();
+  constructor() {
+    effect(() => {
+      if (this.localStorageService.account()?.role !== Role.Supervisor) {
+        return;
+      }
+      untracked(() => {
+        this.listLoading.set(true);
+        this.loadAllRequests();
+      });
+    });
   }
 
   public changeActiveTab(value: SegmentValue | undefined): void {
@@ -54,6 +77,10 @@ export class SupervisorOverviewPage implements ViewWillEnter {
   }
 
   public async onChangeRequestStatus(changedRequest: TimeOffRequest): Promise<void> {
+    const supervisor = this.localStorageService.account();
+    if (!supervisor) {
+      return;
+    }
     const status = this.determineStatus(changedRequest.status);
     const alert = await this.alertController.create({
       header: 'Confirm',
@@ -75,34 +102,39 @@ export class SupervisorOverviewPage implements ViewWillEnter {
     await alert.present();
 
     const { data, role } = await alert.onDidDismiss();
-    if (role === 'cancel') {
+    if (role !== 'confirm') {
       return;
     }
-    if (role === 'confirm') {
-      this.listLoading.set(true);
-      try {
-        const decisionNote: string | undefined = data?.values?.decisionNote?.trim() || undefined;
-        const res = await this.localStorageService.changeRequestStatus(changedRequest, decisionNote);
-        if (res?.status === 'success') {
-          this.notificationService.success('Status successfully updated.');
-          await this.loadAllRequests();
-        } else {
-          this.notificationService.error('Error has occured. Try again later.');
-        }
-      } finally {
-        this.listLoading.set(false);
+    this.savingRequestId.set(changedRequest.id);
+
+    try {
+      const decision: TimeOffRequestDecision = {
+        requestId: changedRequest.id,
+        status: changedRequest.status,
+        decidedByFullName: supervisor.name,
+        decisionNote: data?.values?.decisionNote?.trim() || undefined,
+      };
+      const res = await this.localStorageService.changeRequestStatus(decision);
+      if (res.status === 'success') {
+        this.notificationService.success('Status successfully updated.');
+      } else {
+        this.notificationService.error('Error has occurred. Try again later.');
       }
+    } finally {
+      this.savingRequestId.set(undefined);
     }
   }
 
-  private determineStatus(status: TypeOffRequestStatus): string {
-    return status === TypeOffRequestStatus.Approved ?  status.toLowerCase().slice(0, -1) : status.toLowerCase().slice(0, -2);
+  private determineStatus(status: TimeOffRequestStatus): string {
+    return status === TimeOffRequestStatus.Approved
+      ? status.toLowerCase().slice(0, -1)
+      : status.toLowerCase().slice(0, -2);
   }
 
   private async loadAllRequests(): Promise<void> {
-    const res = await this.localStorageService.loadSupervisorRequests();
-    if (res) {
-      this.allRequests.set(res);
+    try {
+      await this.localStorageService.loadSupervisorRequests();
+    } finally {
       this.listLoading.set(false);
     }
   }

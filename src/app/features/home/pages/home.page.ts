@@ -8,7 +8,7 @@ import { Account, LocalStorageService, Role } from '@timeoff/shared';
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports: [IonContent, LowerCasePipe, IonSpinner]
+  imports: [IonContent, LowerCasePipe, IonSpinner],
 })
 export class HomePage implements ViewWillEnter {
   private readonly router: Router = inject(Router);

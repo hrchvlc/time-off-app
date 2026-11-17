@@ -1,4 +1,4 @@
-import { countWorkingDays, getLocalToday, toCalendarDay } from './date.util';
+import { countCalendarDays, countWorkingDays, getLocalToday, toCalendarDay } from './date.util';
 
 describe('date.util', () => {
   describe('toCalendarDay', () => {
@@ -67,6 +67,29 @@ describe('date.util', () => {
 
     it('returns zero when the end date is before the start date', () => {
       expect(countWorkingDays('2026-11-20', '2026-11-16')).toBe(0);
+    });
+  });
+
+  describe('countCalendarDays', () => {
+    it('counts a single day as one day', () => {
+      expect(countCalendarDays('2026-11-18', '2026-11-18')).toBe(1);
+    });
+
+    it('counts weekends too', () => {
+      expect(countCalendarDays('2026-11-16', '2026-11-22')).toBe(7);
+    });
+
+    it('ignores the time part of date picker values', () => {
+      expect(countCalendarDays('2026-11-20T23:30:00', '2026-11-23T00:15:00')).toBe(4);
+    });
+
+    it('is not affected by daylight saving time changes', () => {
+      expect(countCalendarDays('2026-03-27', '2026-03-30')).toBe(4);
+      expect(countCalendarDays('2026-10-23', '2026-10-26')).toBe(4);
+    });
+
+    it('returns less than one when the end date is before the start date', () => {
+      expect(countCalendarDays('2026-11-20', '2026-11-16')).toBeLessThan(1);
     });
   });
 });

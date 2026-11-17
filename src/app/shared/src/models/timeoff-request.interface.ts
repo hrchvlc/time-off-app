@@ -1,9 +1,8 @@
-import { TypeOffRequestStatus } from "./timeoff-request-status.enum";
-import { TimeOffType } from "./timeoff-type.enum";
+import { TimeOffRequestStatus } from './timeoff-request-status.enum';
+import { TimeOffType } from './timeoff-type.enum';
 
 export interface TimeOffRequest {
   createdAt: string;
-  decidedAt?: string;
   decidedByFullName?: string;
   decisionNote?: string;
   employeeFullName: string;
@@ -12,9 +11,7 @@ export interface TimeOffRequest {
   id: string;
   note?: string;
   startDate: string;
-  status: TypeOffRequestStatus;
-  timeOffAllowance: number;
-  timeOffSpent: number;
+  status: TimeOffRequestStatus;
   type: TimeOffType;
   workingDays: number;
 }

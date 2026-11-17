@@ -23,5 +23,5 @@
 @mixin icon-mask {
   background-color: currentColor;
   -webkit-mask: var(--icon) no-repeat center / contain;
-          mask: var(--icon) no-repeat center / contain;
+  mask: var(--icon) no-repeat center / contain;
 }

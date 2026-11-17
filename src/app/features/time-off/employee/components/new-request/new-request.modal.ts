@@ -1,8 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, input, InputSignal, signal, WritableSignal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
-  IonBadge,
   IonButton,
   IonContent,
   IonDatetime,
@@ -25,11 +24,20 @@ import {
   getLocalToday,
   LocalStorageService,
   maxDurationValidator,
+  NotificationService,
   TimeOffRequest,
+  TimeOffRequestStatus,
   TimeOffType,
   toCalendarDay,
-  TypeOffRequestStatus,
+  workingDaysValidator,
 } from '@timeoff/shared';
+
+interface NewRequestForm {
+  endDate: FormControl<string | null>;
+  note: FormControl<string>;
+  startDate: FormControl<string | null>;
+  type: FormControl<TimeOffType | null>;
+}
 
 @Component({
   selector: 'app-new-request',
@@ -48,26 +56,26 @@ import {
     IonModal,
     IonDatetime,
     IonTextarea,
-    IonBadge,
     IonSpinner,
-    DatePipe
-  ]
+    DatePipe,
+  ],
 })
 export class NewRequestModal {
   private readonly formBuilder: FormBuilder = inject(FormBuilder);
   private readonly modalCtrl: ModalController = inject(ModalController);
   private readonly localStorageService: LocalStorageService = inject(LocalStorageService);
+  private readonly notificationService: NotificationService = inject(NotificationService);
   private readonly account: WritableSignal<Account | undefined> = this.localStorageService.account;
 
   private readonly maxDuration: number = 25;
   public readonly daysLeft: InputSignal<number | undefined> = input<number | undefined>(undefined);
-  public readonly form: FormGroup = this.initializeForm();
+  public readonly form: FormGroup<NewRequestForm> = this.initializeForm();
   public readonly timeOffTypes: TimeOffType[] = Object.values(TimeOffType);
   public readonly today: string = getLocalToday();
   public readonly isSubmitting: WritableSignal<boolean> = signal(false);
 
   public get endMin(): string {
-    return this.form.controls['startDate'].value ?? this.today;
+    return this.form.controls.startDate.value ?? this.today;
   }
 
   public closeModal(): void {
@@ -76,51 +84,52 @@ export class NewRequestModal {
 
   public async createNewRequest(): Promise<void> {
     const account = this.account();
-    if (!account || this.isSubmitting()) {
+    const { startDate, endDate, type, note } = this.form.getRawValue();
+    if (!account || !startDate || !endDate || !type || this.isSubmitting()) {
       return;
     }
-    const rawFormValue = this.form.getRawValue();
     const request: TimeOffRequest = {
-      ...rawFormValue,
-      startDate: toCalendarDay(rawFormValue.startDate),
-      endDate: toCalendarDay(rawFormValue.endDate),
+      startDate: toCalendarDay(startDate),
+      endDate: toCalendarDay(endDate),
+      type,
+      note: note.trim() || undefined,
       employeeId: account.id,
       employeeFullName: account.name,
-      timeOffAllowance: account.timeOffAllowance ?? 0,
-      timeOffSpent: account.timeOffSpent ?? 0,
-      workingDays: countWorkingDays(rawFormValue.startDate, rawFormValue.endDate),
+      workingDays: countWorkingDays(startDate, endDate),
       createdAt: new Date().toISOString(),
       id: crypto.randomUUID(),
-      status: TypeOffRequestStatus.Pending,
+      status: TimeOffRequestStatus.Pending,
     };
 
     this.isSubmitting.set(true);
     try {
       const res = await this.localStorageService.addEmployeeRequest(request);
-      if (res?.status === 'success') {
+      if (res.status === 'success') {
         await this.modalCtrl.dismiss('success');
       } else {
-        await this.modalCtrl.dismiss('error');
+        this.notificationService.error('Error has occurred. Try again later.');
       }
     } finally {
       this.isSubmitting.set(false);
     }
   }
 
-  private initializeForm(): FormGroup {
-    return this.formBuilder.group({
-      startDate: [ null, Validators.required ],
-      endDate: [ null, Validators.required ],
-      type: [ null, Validators.required ],
-      note: [ null, Validators.maxLength(300)  ]
-    },
-    {
-      validators: [
-        dateRangeValidator('startDate', 'endDate'),
-        maxDurationValidator('startDate', 'endDate', this.maxDuration),
-        allowanceValidator('startDate', 'endDate', () => this.daysLeft()),
-      ]
-    }
+  private initializeForm(): FormGroup<NewRequestForm> {
+    return this.formBuilder.group<NewRequestForm>(
+      {
+        startDate: this.formBuilder.control<string | null>(null, Validators.required),
+        endDate: this.formBuilder.control<string | null>(null, Validators.required),
+        type: this.formBuilder.control<TimeOffType | null>(null, Validators.required),
+        note: this.formBuilder.nonNullable.control('', Validators.maxLength(300)),
+      },
+      {
+        validators: [
+          dateRangeValidator('startDate', 'endDate'),
+          workingDaysValidator('startDate', 'endDate'),
+          maxDurationValidator('startDate', 'endDate', this.maxDuration),
+          allowanceValidator('startDate', 'endDate', () => this.daysLeft()),
+        ],
+      },
     );
   }
 }

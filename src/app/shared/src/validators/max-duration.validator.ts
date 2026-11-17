@@ -1,9 +1,5 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
-
-function toDayNumber(value: string): number {
-  const [ year, month, day ] = value.slice(0, 10).split('-').map(Number);
-  return Date.UTC(year, month - 1, day) / 86_400_000;
-}
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { countCalendarDays } from '../utils';
 
 export function maxDurationValidator(startKey: string, endKey: string, maxDays: number): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
@@ -13,7 +9,7 @@ export function maxDurationValidator(startKey: string, endKey: string, maxDays: 
       return null;
     }
 
-    const days = toDayNumber(end) - toDayNumber(start) + 1;
+    const days = countCalendarDays(start, end);
 
     if (days < 1) {
       return null;

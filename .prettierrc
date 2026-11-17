@@ -1,7 +1,8 @@
 {
   "plugins": ["prettier-plugin-organize-imports"],
   "printWidth": 120,
-  "singleQuote": false,
+  "singleQuote": true,
+  "endOfLine": "auto",
   "trailingComma": "all",
   "overrides": [
     {

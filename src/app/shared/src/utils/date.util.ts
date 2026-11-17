@@ -30,7 +30,11 @@ export function countWorkingDays(startDate: string, endDate: string): number {
   const endTimestamp = toUtcTimestamp(endDate);
   let workingDays = 0;
 
-  for (let currentTimestamp = startTimestamp; currentTimestamp <= endTimestamp; currentTimestamp += MILLISECONDS_PER_DAY) {
+  for (
+    let currentTimestamp = startTimestamp;
+    currentTimestamp <= endTimestamp;
+    currentTimestamp += MILLISECONDS_PER_DAY
+  ) {
     const weekday = new Date(currentTimestamp).getUTCDay();
     if (weekday !== SATURDAY && weekday !== SUNDAY) {
       workingDays++;
@@ -40,7 +44,15 @@ export function countWorkingDays(startDate: string, endDate: string): number {
   return workingDays;
 }
 
+/**
+ * Counts calendar days between two dates, both inclusive, weekends included.
+ * Zero or less when the end date is before the start date.
+ */
+export function countCalendarDays(startDate: string, endDate: string): number {
+  return (toUtcTimestamp(endDate) - toUtcTimestamp(startDate)) / MILLISECONDS_PER_DAY + 1;
+}
+
 function toUtcTimestamp(isoDate: string): number {
-  const [ year, month, day ] = toCalendarDay(isoDate).split('-').map(Number);
+  const [year, month, day] = toCalendarDay(isoDate).split('-').map(Number);
   return Date.UTC(year, month - 1, day);
 }

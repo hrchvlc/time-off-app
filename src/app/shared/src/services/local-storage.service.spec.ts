@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { dummyAccounts, mockTimeOffRequests } from '../dummy-data';
-import { Account, Role, TimeOffRequest, TypeOffRequestStatus } from '../models';
+import { Account, Role, TimeOffRequest, TimeOffRequestDecision, TimeOffRequestStatus } from '../models';
 import { LocalStorageService } from './local-storage.service';
 
 const SIMULATED_DELAY_MS: number = 800;
@@ -34,19 +34,27 @@ describe('LocalStorageService', () => {
     return { ...annasMockRequests[0], id: 'req-new', ...overrides };
   }
 
+  function createDecision(
+    request: TimeOffRequest,
+    status: TimeOffRequestStatus,
+    decisionNote?: string,
+  ): TimeOffRequestDecision {
+    return { requestId: request.id, status, decidedByFullName: supervisor.name, decisionNote };
+  }
+
   function savedRequests(): TimeOffRequest[] {
     return JSON.parse(localStorage.getItem(REQUESTS_KEY)!);
   }
 
   describe('loading data', () => {
-    it('returns only the signed-in employee\'s mock requests when nothing is saved', async () => {
+    it("returns only the signed-in employee's mock requests when nothing is saved", async () => {
       const service = createService();
       service.changeAccount(anna);
 
       const loadedRequests = await skipDelay(service.loadEmployeeRequests());
 
       expect(loadedRequests).toEqual(annasMockRequests);
-      expect(service.employeeRequests()).toEqual(annasMockRequests);
+      expect(service.allRequests()).toEqual(annasMockRequests);
     });
 
     it('returns no employee requests when no one is signed in', async () => {
@@ -60,13 +68,13 @@ describe('LocalStorageService', () => {
     it('loads employee requests saved in localStorage', async () => {
       const otherEmployeesRequest = createRequest({ id: 'req-other', employeeId: 'emp-999' });
       const annasRequest = createRequest();
-      localStorage.setItem(REQUESTS_KEY, JSON.stringify([ otherEmployeesRequest, annasRequest ]));
+      localStorage.setItem(REQUESTS_KEY, JSON.stringify([otherEmployeesRequest, annasRequest]));
       const service = createService();
       service.changeAccount(anna);
 
       const loadedRequests = await skipDelay(service.loadEmployeeRequests());
 
-      expect(loadedRequests).toEqual([ annasRequest ]);
+      expect(loadedRequests).toEqual([annasRequest]);
     });
 
     it('falls back to mock data and removes a corrupted saved value', async () => {
@@ -85,7 +93,7 @@ describe('LocalStorageService', () => {
       const loadedRequests = await skipDelay(service.loadSupervisorRequests());
 
       expect(loadedRequests).toEqual(mockTimeOffRequests);
-      expect(service.supervisorRequests()).toEqual(mockTimeOffRequests);
+      expect(service.allRequests()).toEqual(mockTimeOffRequests);
     });
 
     it('falls back to dummy accounts when nothing is saved', async () => {
@@ -179,19 +187,50 @@ describe('LocalStorageService', () => {
       expect(service.account()).toBeUndefined();
       expect(localStorage.getItem('account')).toBeNull();
     });
+
+    it("drops the previous account's requests when the account changes", async () => {
+      const service = createService();
+      service.changeAccount(supervisor);
+      await skipDelay(service.loadSupervisorRequests());
+
+      service.changeAccount(anna);
+
+      expect(service.allRequests()).toEqual([]);
+    });
+
+    it('keeps the loaded requests when the signed-in account is picked again', async () => {
+      const service = createService();
+      service.changeAccount(anna);
+      await skipDelay(service.loadEmployeeRequests());
+
+      service.changeAccount({ ...anna });
+
+      expect(service.allRequests()).toEqual(annasMockRequests);
+    });
+
+    it('drops the loaded requests on logout', async () => {
+      const service = createService();
+      service.changeAccount(anna);
+      await skipDelay(service.loadEmployeeRequests());
+
+      service.clearAccount();
+
+      expect(service.allRequests()).toEqual([]);
+    });
   });
 
   describe('addEmployeeRequest', () => {
-    it('adds the request to the list and saves it', async () => {
+    it('adds the request to the loaded list and saves it, without a reload', async () => {
       const service = createService();
       service.changeAccount(anna);
+      await skipDelay(service.loadEmployeeRequests());
       const newRequest = createRequest();
 
       const response = await skipDelay(service.addEmployeeRequest(newRequest));
 
       expect(response.status).toBe('success');
-      expect(savedRequests()).toEqual([ ...mockTimeOffRequests, newRequest ]);
-      expect(service.employeeRequests()).toEqual([ ...annasMockRequests, newRequest ]);
+      expect(savedRequests()).toEqual([...mockTimeOffRequests, newRequest]);
+      expect(service.allRequests()).toEqual([...annasMockRequests, newRequest]);
     });
 
     it('keeps requests added earlier', async () => {
@@ -202,7 +241,7 @@ describe('LocalStorageService', () => {
       await skipDelay(service.addEmployeeRequest(firstRequest));
       await skipDelay(service.addEmployeeRequest(secondRequest));
 
-      expect(savedRequests()).toEqual([ ...mockTimeOffRequests, firstRequest, secondRequest ]);
+      expect(savedRequests()).toEqual([...mockTimeOffRequests, firstRequest, secondRequest]);
     });
 
     it('does not change the mock data', async () => {
@@ -216,41 +255,97 @@ describe('LocalStorageService', () => {
   });
 
   describe('changeRequestStatus', () => {
-    const pendingRequest: TimeOffRequest = mockTimeOffRequests.find((request) => request.status === TypeOffRequestStatus.Pending)!;
+    const pendingRequest: TimeOffRequest = mockTimeOffRequests.find(
+      (request) => request.status === TimeOffRequestStatus.Pending,
+    )!;
 
-    it('changes the status of the matching request only and saves it', async () => {
+    /** The supervisor page always loads the team's requests before a decision is made. */
+    async function createLoadedService(): Promise<LocalStorageService> {
       const service = createService();
-      const [ changedRequest, ...otherRequests ] = mockTimeOffRequests;
-      const newStatus = changedRequest.status === TypeOffRequestStatus.Approved
-        ? TypeOffRequestStatus.Rejected
-        : TypeOffRequestStatus.Approved;
+      await skipDelay(service.loadSupervisorRequests());
+      return service;
+    }
 
-      const response = await skipDelay(service.changeRequestStatus({ ...changedRequest, status: newStatus }));
+    it('changes the status of the matching request only and saves it, without a reload', async () => {
+      const service = await createLoadedService();
+      const [changedRequest, ...otherRequests] = mockTimeOffRequests;
+      const newStatus =
+        changedRequest.status === TimeOffRequestStatus.Approved
+          ? TimeOffRequestStatus.Rejected
+          : TimeOffRequestStatus.Approved;
+
+      const response = await skipDelay(service.changeRequestStatus(createDecision(changedRequest, newStatus)));
 
       expect(response.status).toBe('success');
-      expect(service.supervisorRequests()[0].status).toBe(newStatus);
-      expect(service.supervisorRequests().slice(1)).toEqual(otherRequests);
-      expect(savedRequests()).toEqual(service.supervisorRequests());
+      expect(service.allRequests()[0].status).toBe(newStatus);
+      expect(service.allRequests().slice(1)).toEqual(otherRequests);
+      expect(savedRequests()).toEqual(service.allRequests());
     });
 
-    it('saves the supervisor note with the decision', async () => {
-      const service = createService();
+    it('saves who decided and the supervisor note with the decision', async () => {
+      const service = await createLoadedService();
 
-      await skipDelay(service.changeRequestStatus({ ...pendingRequest, status: TypeOffRequestStatus.Rejected }, 'Team is short-staffed that week.'));
+      await skipDelay(
+        service.changeRequestStatus(
+          createDecision(pendingRequest, TimeOffRequestStatus.Rejected, 'Team is short-staffed that week.'),
+        ),
+      );
 
-      const decidedRequest = service.supervisorRequests().find((request) => request.id === pendingRequest.id)!;
-      expect(decidedRequest.decisionNote).toBe('Team is short-staffed that week.');
-      const savedRequest = savedRequests().find((request) => request.id === pendingRequest.id)!;
-      expect(savedRequest.decisionNote).toBe('Team is short-staffed that week.');
+      for (const requests of [service.allRequests(), savedRequests()]) {
+        const decidedRequest = requests.find((request) => request.id === pendingRequest.id)!;
+        expect(decidedRequest.decidedByFullName).toBe(supervisor.name);
+        expect(decidedRequest.decisionNote).toBe('Team is short-staffed that week.');
+      }
     });
 
     it('saves no note when the supervisor leaves it empty', async () => {
-      const service = createService();
+      const service = await createLoadedService();
 
-      await skipDelay(service.changeRequestStatus({ ...pendingRequest, status: TypeOffRequestStatus.Approved }));
+      await skipDelay(service.changeRequestStatus(createDecision(pendingRequest, TimeOffRequestStatus.Approved)));
 
-      const decidedRequest = service.supervisorRequests().find((request) => request.id === pendingRequest.id)!;
+      const decidedRequest = service.allRequests().find((request) => request.id === pendingRequest.id)!;
       expect(decidedRequest.decisionNote).toBeUndefined();
+    });
+  });
+
+  describe('when storage is full', () => {
+    /** Called after the setup, which also writes to localStorage (the chosen account). */
+    function fillStorage(): void {
+      vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+        throw new DOMException('Storage is full', 'QuotaExceededError');
+      });
+    }
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('returns an error for a new request and does not show it in the list', async () => {
+      const service = createService();
+      service.changeAccount(anna);
+      await skipDelay(service.loadEmployeeRequests());
+      fillStorage();
+
+      const response = await skipDelay(service.addEmployeeRequest(createRequest()));
+
+      expect(response.status).toBe('error');
+      expect(service.allRequests()).toEqual(annasMockRequests);
+    });
+
+    it('returns an error for a decision and keeps the request pending', async () => {
+      const service = createService();
+      await skipDelay(service.loadSupervisorRequests());
+      const pendingRequest = mockTimeOffRequests.find((request) => request.status === TimeOffRequestStatus.Pending)!;
+      fillStorage();
+
+      const response = await skipDelay(
+        service.changeRequestStatus(createDecision(pendingRequest, TimeOffRequestStatus.Approved)),
+      );
+
+      expect(response.status).toBe('error');
+      expect(service.allRequests().find((request) => request.id === pendingRequest.id)!.status).toBe(
+        TimeOffRequestStatus.Pending,
+      );
     });
   });
 
@@ -258,7 +353,7 @@ describe('LocalStorageService', () => {
     it('shows a request submitted by an employee to the supervisor', async () => {
       const service = createService();
       service.changeAccount(anna);
-      const newRequest = createRequest({ id: 'req-from-anna', status: TypeOffRequestStatus.Pending });
+      const newRequest = createRequest({ id: 'req-from-anna', status: TimeOffRequestStatus.Pending });
       await skipDelay(service.addEmployeeRequest(newRequest));
 
       service.changeAccount(supervisor);
@@ -267,20 +362,22 @@ describe('LocalStorageService', () => {
       expect(supervisorRequests).toContainEqual(newRequest);
     });
 
-    it('shows the supervisor decision and note to the employee', async () => {
+    it('shows the supervisor decision, decider and note to the employee', async () => {
       const service = createService();
-      const annasPendingRequest = annasMockRequests.find((request) => request.status === TypeOffRequestStatus.Pending)!;
+      const annasPendingRequest = annasMockRequests.find((request) => request.status === TimeOffRequestStatus.Pending)!;
       service.changeAccount(supervisor);
-      await skipDelay(service.changeRequestStatus(
-        { ...annasPendingRequest, status: TypeOffRequestStatus.Approved },
-        'Enjoy your day off.',
-      ));
+      await skipDelay(
+        service.changeRequestStatus(
+          createDecision(annasPendingRequest, TimeOffRequestStatus.Approved, 'Enjoy your day off.'),
+        ),
+      );
 
       service.changeAccount(anna);
       const employeeRequests = await skipDelay(service.loadEmployeeRequests());
 
       const decidedRequest = employeeRequests.find((request) => request.id === annasPendingRequest.id)!;
-      expect(decidedRequest.status).toBe(TypeOffRequestStatus.Approved);
+      expect(decidedRequest.status).toBe(TimeOffRequestStatus.Approved);
+      expect(decidedRequest.decidedByFullName).toBe(supervisor.name);
       expect(decidedRequest.decisionNote).toBe('Enjoy your day off.');
     });
   });

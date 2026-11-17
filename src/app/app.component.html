@@ -10,14 +10,18 @@
         @for (account of demoAccounts(); track account.id) {
           @let isActive = account.id === activeAccount()?.id;
           <ion-menu-toggle [autoHide]="false">
-            <ion-item button
-                      (click)="chooseAccount(account)"
-                      [class.active]="isActive"
-                      [attr.aria-current]="isActive ? 'true' : null">
-              <span class="avatar"
-                    aria-hidden="true"
-                    [class.supervisor]="account.role === Role.Supervisor"
-                    [style.--icon]="'url(assets/icons/' + (account.role | lowercase) + '.svg)'">
+            <ion-item
+              button
+              (click)="chooseAccount(account)"
+              [class.active]="isActive"
+              [attr.aria-current]="isActive ? 'true' : null"
+            >
+              <span
+                class="avatar"
+                aria-hidden="true"
+                [class.supervisor]="account.role === Role.Supervisor"
+                [style.--icon]="'url(assets/icons/' + (account.role | lowercase) + '.svg)'"
+              >
               </span>
               <ion-label>
                 <span class="name">{{ account.name }}</span>
